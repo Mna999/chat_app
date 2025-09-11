@@ -73,6 +73,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       bool isDay = false;
+
                       if (index > 0) {
                         if (snapshot.data![index].timeSent.day !=
                             snapshot.data![index - 1].timeSent.day) {

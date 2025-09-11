@@ -1,4 +1,5 @@
 import 'package:chat_app/models/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 enum MessageType { text, image, video, file, audio }
@@ -19,9 +20,20 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
+    final ts = json['timeSent'];
+    DateTime? sent;
+
+    if (ts is Timestamp) {
+      sent = ts.toDate();
+    } else if (ts is String) {
+      sent = DateTime.tryParse(ts);
+    } else if (ts is DateTime) {
+      sent = ts;
+    }
+
     return Message(
-      content: json['content'],
-      timeSent: DateTime.parse(json['timeSent']),
+      content: json['content'] ?? '',
+      timeSent: sent ?? DateTime.now(), 
       from: User.fromJson(json['from']),
       to: User.fromJson(json['to']),
       messageType: MessageType.text,
@@ -31,7 +43,7 @@ class Message {
   Map<String, dynamic> toJson() {
     return {
       'content': content,
-      'timeSent': timeSent.toIso8601String(),
+      'timeSent': timeSent,
       'from': from.toJson(),
       'to': to.toJson(),
       'messageType': 'text',
@@ -39,11 +51,18 @@ class Message {
   }
 
   String getDate() {
-    DateTime now = DateTime.now();
-    int diffDays = now.difference(timeSent).inDays;
+    DateTime now = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
+    DateTime time = DateTime(timeSent.year, timeSent.month, timeSent.day);
+
+    int diffDays = now.difference(time).inDays;
 
     if (diffDays == 0) {
       // 🔹 Today → show "Today at <time>"
+
       return 'Today at ${DateFormat.jm().format(timeSent)}';
       // e.g. Today at 3:45 PM
     } else if (diffDays == 1) {

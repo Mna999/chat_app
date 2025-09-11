@@ -14,12 +14,10 @@ class MessagesRepo {
   Future<void> addMessage(Chat chat, Message message, User me) async {
     chat.lastMessage = message;
     await ChatsController().saveChat(chat, me);
-
-    await fireStore
-        .doc(chat.id)
-        .collection('messages')
-        .doc()
-        .set(message.toJson());
+    await fireStore.doc(chat.id).collection('messages').doc().set({
+      ...message.toJson(),
+      'timeSent': FieldValue.serverTimestamp(),
+    });
     await FirebaseFirestore.instance
         .collection('users')
         .doc(chat.friend.id)
@@ -27,7 +25,8 @@ class MessagesRepo {
         .doc(chat.id)
         .collection('messages')
         .doc()
-        .set(message.toJson());
+        .set({...message.toJson(), 'timeSent': FieldValue.serverTimestamp()});
+        
   }
 
   Stream<List<Map<String, dynamic>>> getMessages(Chat chat) {
@@ -36,6 +35,13 @@ class MessagesRepo {
         .collection('messages')
         .orderBy('timeSent', descending: false)
         .snapshots()
-        .map((snapShot) => snapShot.docs.map((e) => e.data()).toList());
+        .map((snapShot) {
+          final data = snapShot.docs.map((e) {
+            final message = e.data();
+            print("Message date: ${message['timeSent']}");
+            return message;
+          }).toList();
+          return data;
+        });
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chat_app/controllers/AuthController.dart';
 import 'package:chat_app/controllers/chatController.dart';
 import 'package:chat_app/controllers/userController.dart';
@@ -22,15 +24,78 @@ class _HomeScreenState extends State<HomeScreen> {
   User user = User(id: '', username: '', email: '');
   bool isLoggingOut = false;
 
+  // Add a StreamSubscription to manage the chats stream
+  StreamSubscription? _chatsSubscription;
+  final StreamController<List<Chat>> _chatsStreamController =
+      StreamController<List<Chat>>.broadcast();
+
   @override
   void initState() {
     super.initState();
     loadUser();
+    _setupChatsStream();
   }
 
   void loadUser() async {
     user = await userController.loadUser();
     setState(() {});
+  }
+
+  void _setupChatsStream() {
+    _chatsSubscription = chatsController.getChats().listen(
+      (chats) {
+        if (!_chatsStreamController.isClosed) {
+          _chatsStreamController.add(chats);
+        }
+      },
+      onError: (error) {
+        print('Chats stream error: $error');
+        if (!_chatsStreamController.isClosed) {
+          _chatsStreamController.addError(error);
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    // Cancel the subscription and close the stream controller
+    _chatsSubscription?.cancel();
+    _chatsStreamController.close();
+    super.dispose();
+  }
+
+  Future<void> _handleLogout() async {
+    setState(() {
+      isLoggingOut = true;
+    });
+
+    try {
+      // Cancel the chats subscription first
+      await _chatsSubscription?.cancel();
+      _chatsSubscription = null;
+
+      // Close the stream controller
+      if (!_chatsStreamController.isClosed) {
+        _chatsStreamController.close();
+      }
+
+      // Now log out
+      await authController.logOut();
+
+      // Navigate to login screen
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Loginscreen()),
+        );
+      }
+    } catch (e) {
+      print('Logout error: $e');
+      setState(() {
+        isLoggingOut = false;
+      });
+    }
   }
 
   @override
@@ -88,26 +153,16 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ],
-
         leading: IconButton(
-          onPressed: () async {
-            isLoggingOut = true;
-            setState(() {});
-            await authController.logOut();
-
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => Loginscreen()),
-            );
-          },
+          onPressed: _handleLogout,
           icon: const Icon(Icons.exit_to_app_outlined),
           iconSize: 30,
         ),
       ),
       body: isLoggingOut
           ? const Center(child: CircularProgressIndicator())
-          : StreamBuilder(
-              stream: chatsController.getChats(),
+          : StreamBuilder<List<Chat>>(
+              stream: _chatsStreamController.stream,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());

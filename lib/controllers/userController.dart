@@ -28,6 +28,11 @@ class UserController {
     return res;
   }
 
+  Future<bool> usernameExists(String username) async {
+    final res = await repo.search(username);
+    return res.isNotEmpty;
+  }
+
   Future<User> getUserById(String id) async {
     Map<String, dynamic> json = await repo.getUserById(id);
     User user = User.fromJson(json);

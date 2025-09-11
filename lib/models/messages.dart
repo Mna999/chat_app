@@ -20,20 +20,10 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
-    final ts = json['timeSent'];
-    DateTime? sent;
-
-    if (ts is Timestamp) {
-      sent = ts.toDate();
-    } else if (ts is String) {
-      sent = DateTime.tryParse(ts);
-    } else if (ts is DateTime) {
-      sent = ts;
-    }
-
     return Message(
       content: json['content'] ?? '',
-      timeSent: sent ?? DateTime.now(), 
+      timeSent: (json['timeSent'] as Timestamp).toDate(),
+
       from: User.fromJson(json['from']),
       to: User.fromJson(json['to']),
       messageType: MessageType.text,

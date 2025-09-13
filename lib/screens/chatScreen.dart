@@ -24,11 +24,17 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final List<Message> _cachedMessages = [];
+  Timer timer = Timer(const Duration(seconds: 90), () {});
 
   MessagesController messagesController = MessagesController();
   UserController userController = UserController();
   TextEditingController messageController = TextEditingController();
   bool isOnline = true;
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +61,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
           subtitle: StatefulBuilder(
             builder: (context, setState) {
-              Timer.periodic(const Duration(seconds: 90), (timer) {
+              timer = Timer.periodic(const Duration(seconds: 90), (timer) {
                 if (isOnline) setState(() {});
               });
               print('aa');

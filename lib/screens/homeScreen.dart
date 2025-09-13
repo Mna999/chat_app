@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chat_app/controllers/AuthController.dart';
 import 'package:chat_app/controllers/chatController.dart';
+import 'package:chat_app/controllers/messagesController.dart';
 import 'package:chat_app/controllers/presenceHandler.dart';
 import 'package:chat_app/controllers/userController.dart';
 import 'package:chat_app/models/chat.dart';
@@ -22,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   UserController userController = UserController();
   AuthController authController = AuthController();
   ChatsController chatsController = ChatsController();
+  MessagesController messagesController = MessagesController();
   User user = User(
     id: '',
     username: '',
@@ -226,9 +228,34 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : '${snapshot.data![index].lastMessage!.from.username} : ${snapshot.data![index].lastMessage!.content}',
                             style: const TextStyle(color: Colors.grey),
                           ),
-                          trailing: Text(
-                            snapshot.data![index].lastMessage!.getDate2(),
-                            style: const TextStyle(color: Colors.grey),
+                          trailing: StreamBuilder(
+                            stream: messagesController.unseenCount(
+                              snapshot.data![index],
+                              user,
+                            ),
+                            builder: (context, asyncSnapshot) {
+                              return Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    snapshot.data![index].lastMessage!
+                                        .getDate2(),
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                  if (asyncSnapshot.data != null &&
+                                      asyncSnapshot.data! > 0 &&
+                                      asyncSnapshot.hasData &&
+                                      asyncSnapshot.connectionState ==
+                                          ConnectionState.active)
+                                    CircleAvatar(
+                                      radius: 12,
+                                      child: Text('${asyncSnapshot.data!}'),
+                                    ),
+                                ],
+                              );
+                            },
                           ),
                           leading: Hero(
                             tag: 'pfp',

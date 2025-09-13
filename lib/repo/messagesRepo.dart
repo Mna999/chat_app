@@ -63,4 +63,13 @@ class MessagesRepo {
           return data;
         });
   }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> unSeenCount(Chat chat, User me) {
+    return fireStore
+        .doc(chat.id)
+        .collection('messages')
+        .where('to.id', isEqualTo: me.id)
+        .where('isSeen', isEqualTo: false)
+        .snapshots();
+  }
 }

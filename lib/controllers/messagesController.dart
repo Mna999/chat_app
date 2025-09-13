@@ -23,4 +23,8 @@ class MessagesController {
       return messages;
     });
   }
+
+  Stream<int> unseenCount(Chat chat,User me) {
+    return messagesRepo.unSeenCount(chat,me).map((event) => event.docs.length);
+  }
 }

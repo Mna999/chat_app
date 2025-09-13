@@ -183,6 +183,9 @@ class _SignUpscreenState extends ConsumerState<SignUpscreen> {
                                         .uid,
                                     username: username,
                                     profilePictureUrl: '',
+                                    lastActive: DateTime.now(),
+                                    isOnline: true
+                                    
                                   );
                                   await UserController().saveUser(user);
                                   Navigator.pushReplacement(

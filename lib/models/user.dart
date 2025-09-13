@@ -1,16 +1,22 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+
 class User {
   String id;
   String username;
   String email;
   String? profilePictureUrl;
+  DateTime lastActive;
+  bool isOnline;
 
   User({
     required this.id,
     required this.username,
     required this.email,
+    required this.lastActive,
+    required this.isOnline,
     this.profilePictureUrl,
   });
-
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -18,6 +24,10 @@ class User {
       username: json['username'],
       email: json['email'],
       profilePictureUrl: json['profilePictureUrl'],
+      lastActive: json['lastSeen'] != null
+          ? (json['lastSeen'] as Timestamp).toDate()
+          : DateTime.now(),
+      isOnline: json['isOnline'] ?? false,
     );
   }
   Map<String, dynamic> toJson() {
@@ -27,5 +37,31 @@ class User {
       'email': email,
       'profilePictureUrl': profilePictureUrl,
     };
+  }
+
+  String getLastActive() {
+    DateTime now = DateTime.now();
+
+    Duration diffDays = now.difference(lastActive);
+
+    if (diffDays.inMinutes < 1) {
+      // 🔹 Today → show "Today at <time>"
+
+      return 'Online';
+      // e.g. Today at 3:45 PM
+    } else if (diffDays.inMinutes >= 1) {
+      return 'Last Seen: Today at ${DateFormat.jm().format(lastActive)}';
+    } else if (diffDays.inDays == 1) {
+      return 'Last Seen: Yesterday at ${DateFormat.jm().format(lastActive)}';
+      // e.g. Yesterday at 8:20 PM
+    } else if (now.year == lastActive.year) {
+      // Same year → show date + time
+      return 'Last Seen: ${DateFormat('MMM d').format(lastActive)} at ${DateFormat.jm().format(lastActive)}';
+      // e.g. Sep 10 at 4:10 PM
+    } else {
+      // Different year → full date + time
+      return 'Last Seen: ${DateFormat('MMM d, yyyy').format(lastActive)} at ${DateFormat.jm().format(lastActive)}';
+      // e.g. Sep 10, 2024 at 7:30 AM
+    }
   }
 }

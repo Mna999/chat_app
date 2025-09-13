@@ -23,11 +23,12 @@ class Chat {
           json['lastMessage'] != null &&
               (json['lastMessage'] as Map<String, dynamic>).isNotEmpty
           ? Message.fromJson(json['lastMessage'])
-          : Message(
+          : Message(isSeen: false,
+          id: '',
               content: '',
               timeSent: DateTime.now(),
-              from: User(id: '', username: '', email: ''),
-              to: User(id: '', username: '', email: ''),
+              from: User(id: '', username: '', email: '',lastActive: DateTime.now(),isOnline: true),
+              to: User(id: '', username: '', email: '',lastActive: DateTime.now(),isOnline: true),
             ),
     );
   }

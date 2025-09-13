@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chat_app/controllers/AuthController.dart';
 import 'package:chat_app/controllers/chatController.dart';
+import 'package:chat_app/controllers/presenceHandler.dart';
 import 'package:chat_app/controllers/userController.dart';
 import 'package:chat_app/models/chat.dart';
 import 'package:chat_app/models/user.dart';
@@ -21,8 +22,15 @@ class _HomeScreenState extends State<HomeScreen> {
   UserController userController = UserController();
   AuthController authController = AuthController();
   ChatsController chatsController = ChatsController();
-  User user = User(id: '', username: '', email: '');
+  User user = User(
+    id: '',
+    username: '',
+    email: '',
+    lastActive: DateTime.now(),
+    isOnline: true,
+  );
   bool isLoggingOut = false;
+  final PresenceHandler _presenceHandler = PresenceHandler();
 
   // Add a StreamSubscription to manage the chats stream
   StreamSubscription? _chatsSubscription;
@@ -38,6 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void loadUser() async {
     user = await userController.loadUser();
+    userController.saveUserDate(user);
+    _presenceHandler.init(user);
     setState(() {});
   }
 
@@ -60,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     // Cancel the subscription and close the stream controller
+    _presenceHandler.dispose();
     _chatsSubscription?.cancel();
     _chatsStreamController.close();
     super.dispose();
@@ -69,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isLoggingOut = true;
     });
+    _presenceHandler.dispose();
 
     try {
       // Cancel the chats subscription first
@@ -161,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: isLoggingOut
           ? const Center(child: CircularProgressIndicator())
-          : StreamBuilder<List<Chat>>(
+          : StreamBuilder(
               stream: _chatsStreamController.stream,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {

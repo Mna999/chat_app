@@ -14,6 +14,10 @@ class UserController {
     return val;
   }
 
+  Future<void> saveUserDate(User user) async {
+    await repo.saveUserDate(user);
+  }
+
   Future<List<User>> searchUser(String username, User me) async {
     List<Map<String, dynamic>> jsonList = await repo.search(username);
     List<User> res = jsonList
@@ -37,5 +41,9 @@ class UserController {
     Map<String, dynamic> json = await repo.getUserById(id);
     User user = User.fromJson(json);
     return user;
+  }
+
+  Stream<User> streamUser(String id) {
+    return repo.userStream(id).map((event) => User.fromJson(event));
   }
 }

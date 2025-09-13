@@ -45,6 +45,7 @@ dependencies:
   intl: ^0.20.2
   chat_bubbles: ^1.7.0
   text_scroll: ^0.2.1
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:

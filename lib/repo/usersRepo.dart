@@ -9,7 +9,16 @@ class UsersRepo {
     await fireStore.doc(user.id).set({
       ...user.toJson(),
       'lowerCaseUser': user.username.toLowerCase(),
+      'lastSeen': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+  }
+
+  Future<void> saveUserDate(User user) async {
+    await fireStore.doc(user.id).set({
+      'lastSeen': FieldValue.serverTimestamp(),
+      'isOnline':true
+      
+    },SetOptions(merge: true));
   }
 
   Future<Map<String, dynamic>> loadUser() async {
@@ -43,5 +52,10 @@ class UsersRepo {
       return snapshot.docs.first.data();
     }
     return {};
+  }
+
+  Stream<Map<String, dynamic>> userStream(String id) {
+    final snapshot = fireStore.doc(id).snapshots();
+    return snapshot.map((event) => event.data() as Map<String, dynamic>);
   }
 }

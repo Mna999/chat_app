@@ -10,12 +10,16 @@ class Message {
   User from;
   User to;
   MessageType messageType;
+  bool isSeen;
+  String id;
 
   Message({
     required this.content,
     required this.timeSent,
     required this.from,
     required this.to,
+    required this.isSeen,
+    required this.id,
     this.messageType = MessageType.text,
   });
 
@@ -23,19 +27,22 @@ class Message {
     return Message(
       content: json['content'] ?? '',
       timeSent: (json['timeSent'] as Timestamp).toDate(),
-
+      isSeen: json['isSeen'] as bool,
       from: User.fromJson(json['from']),
       to: User.fromJson(json['to']),
+      id: json['id'],
       messageType: MessageType.text,
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic>  toJson() {
     return {
       'content': content,
       'timeSent': timeSent,
       'from': from.toJson(),
       'to': to.toJson(),
+      'id': id,
+      'isSeen':isSeen,
       'messageType': 'text',
     };
   }

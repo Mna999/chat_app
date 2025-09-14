@@ -173,18 +173,18 @@ class _SignUpscreenState extends ConsumerState<SignUpscreen> {
                                 try {
                                   formKey.currentState!.save();
                                   isLoadingRef.set();
-                                  await authController.signUp(email, password);
+                                  await authController.signUp(email.trim(), password.trim());
                                   isLoadingRef.reset();
                                   User user = User(
-                                    email: email,
+                                    email: email.trim(),
                                     id: authController
                                         .fireBaseAuth
                                         .currentUser!
                                         .uid,
-                                    username: username,
+                                    username: username.trim(),
                                     profilePictureUrl: '',
                                     lastActive: DateTime.now(),
-                                    isOnline: true
+                              
                                     
                                   );
                                   await UserController().saveUser(user);

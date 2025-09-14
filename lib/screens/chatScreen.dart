@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chat_app/controllers/chatController.dart';
 import 'package:chat_app/controllers/mergeStreamController.dart';
 import 'package:chat_app/controllers/messagesController.dart';
 import 'package:chat_app/controllers/userController.dart';
@@ -25,17 +26,29 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final List<Message> _cachedMessages = [];
   Timer timer = Timer(const Duration(seconds: 90), () {});
+  FocusNode focusNode = FocusNode();
 
   MessagesController messagesController = MessagesController();
   UserController userController = UserController();
   TextEditingController messageController = TextEditingController();
+  ChatsController chatsController = ChatsController();
   bool isOnline = true;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   void dispose() {
+    focusNode.dispose();
+    messageController.dispose();
+    chatsController.setTyping(widget.chat, false);
     timer.cancel();
     super.dispose();
   }
 
+  String prevText = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,21 +75,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           subtitle: StatefulBuilder(
             builder: (context, setState) {
               timer = Timer.periodic(const Duration(seconds: 90), (timer) {
-                if (isOnline) setState(() {});
+                if (isOnline && mounted) setState(() {});
               });
               print('aa');
               return StreamBuilder(
-                stream: userController.streamUser(widget.chat.friend.id),
+                stream: combineStreams(
+                  userController.streamUser(widget.chat.friend.id),
+                  chatsController.getIsTyping(widget.chat, widget.me.id),
+                ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting ||
                       !snapshot.hasData ||
                       snapshot.data == null) {
                     return const SizedBox();
                   }
-                  isOnline = snapshot.data!.getLastActive() == 'Online';
+                  isOnline = snapshot.data!.data1.getLastActive() == 'Online';
+                  bool isTyping = snapshot.data!.data2;
                   return TextScroll(
-                    snapshot.data!.getLastActive(),
-
+                    isTyping
+                        ? 'Typing...'
+                        : snapshot.data!.data1.getLastActive(),
+                    intervalSpaces: 10,
                     style: const TextStyle(fontSize: 14),
                     velocity: const Velocity(pixelsPerSecond: Offset(30, 0)),
                     pauseBetween: const Duration(seconds: 1),
@@ -125,6 +144,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 _cachedMessages
                   ..clear()
                   ..addAll(messagesData);
+
                 return buildChatBubbles(messagesData);
               },
             ),
@@ -147,26 +167,36 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  child: TextField(
-                    controller: messageController,
-                    onChanged: (value) {
-                      ref.read(textProvider.notifier).setText(value);
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Type your message...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      disabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(100),
+                Consumer(
+                  builder: (context, ref, _) => SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    child: TextField(
+                      controller: messageController,
+                      focusNode: focusNode,
+                      onChanged: (value) {
+                        ref.read(textProvider.notifier).setText(value);
+                        if (value.isEmpty) {
+                          chatsController.setTyping(widget.chat, false);
+                        }
+                        if (value.isNotEmpty && prevText.isEmpty) {
+                          chatsController.setTyping(widget.chat, true);
+                        }
+                        prevText = value;
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Type your message...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
                       ),
                     ),
                   ),
@@ -186,12 +216,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     builder: (context, ref, _) {
                       String text = ref.watch(textProvider);
                       return IconButton(
-                        onPressed: text.isEmpty
+                        onPressed: text.trim().isEmpty
                             ? null
                             : () {
                                 FocusScope.of(context).unfocus();
                                 messageController.clear();
-                                String send = text;
+                                String send = text.trim();
                                 ref.read(textProvider.notifier).setText('');
 
                                 Message message = Message(
@@ -202,8 +232,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                   id: '',
                                   isSeen: false,
                                 );
-                                _cachedMessages.add(message);
-                                setState(() {});
+
                                 messagesController.sendMessage(
                                   widget.chat,
                                   message,
@@ -241,14 +270,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           if (index == messagesData.length - 1) {
             isDay = true;
           } else {
-            final nextMessage = messagesData[messagesData.length - index - 2];
-            if (message.timeSent.day != nextMessage.timeSent.day) {
+            final prevMessage = messagesData[messagesData.length - 2 - index];
+            final prevMessageDate = DateTime(
+              prevMessage.timeSent.year,
+              prevMessage.timeSent.month,
+              prevMessage.timeSent.day,
+            );
+            final messageDate = DateTime(
+              message.timeSent.year,
+              message.timeSent.month,
+              message.timeSent.day,
+            );
+            if (messageDate.difference(prevMessageDate).inDays >= 1) {
               isDay = true;
             }
           }
 
-          if (message.to.id == widget.me.id && !message.isSeen)
+          if (message.to.id == widget.me.id && !message.isSeen) {
             messagesController.setSeen(widget.chat, widget.me, message);
+          }
 
           return Column(
             children: [

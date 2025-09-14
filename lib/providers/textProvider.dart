@@ -10,4 +10,8 @@ class TextNotifier extends StateNotifier<String> {
   void setText(String text) {
     state = text;
   }
+
+  bool isEmpty() {
+    return state.isEmpty;
+  }
 }

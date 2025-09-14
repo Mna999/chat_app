@@ -24,13 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   AuthController authController = AuthController();
   ChatsController chatsController = ChatsController();
   MessagesController messagesController = MessagesController();
-  User user = User(
-    id: '',
-    username: '',
-    email: '',
-    lastActive: DateTime.now(),
-    isOnline: true,
-  );
+  User user = User(id: '', username: '', email: '', lastActive: DateTime.now());
   bool isLoggingOut = false;
   final PresenceHandler _presenceHandler = PresenceHandler();
 
@@ -153,7 +147,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   subtitle: Text(friend.email),
                   onTap: () async {
                     Chat? res = await chatsController.getChat(friend);
-                    Chat chat = res ?? Chat(id: '1', title: '', friend: friend);
+                    Chat chat =
+                        res ??
+                        Chat(
+                          id: '1',
+                          title: '',
+                          friend: friend,
+                          isTyping: false,
+                        );
                     Navigator.pop(context);
                     Navigator.push(
                       context,
@@ -219,14 +220,39 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          subtitle: Text(
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            snapshot.data![index].lastMessage!.from.id ==
-                                    user.id
-                                ? ' me : ${snapshot.data![index].lastMessage!.content}'
-                                : '${snapshot.data![index].lastMessage!.from.username} : ${snapshot.data![index].lastMessage!.content}',
-                            style: const TextStyle(color: Colors.grey),
+                          subtitle: StreamBuilder(
+                            stream: chatsController.getIsTyping(
+                              snapshot.data![index],
+                              user.id,
+                            ),
+                            builder: (context, asyncSnapshot) {
+                              return Text(
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                asyncSnapshot.data != null &&
+                                        asyncSnapshot.connectionState ==
+                                            ConnectionState.active &&
+                                        asyncSnapshot.data!
+                                    ? 'Typing...'
+                                    : snapshot
+                                              .data![index]
+                                              .lastMessage!
+                                              .from
+                                              .id ==
+                                          user.id
+                                    ? ' me : ${snapshot.data![index].lastMessage!.content}'
+                                    : '${snapshot.data![index].lastMessage!.from.username} : ${snapshot.data![index].lastMessage!.content}',
+                                style: TextStyle(
+                                  color:
+                                      asyncSnapshot.data != null &&
+                                          asyncSnapshot.connectionState ==
+                                              ConnectionState.active &&
+                                          asyncSnapshot.data!
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                ),
+                              );
+                            },
                           ),
                           trailing: StreamBuilder(
                             stream: messagesController.unseenCount(
@@ -251,7 +277,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ConnectionState.active)
                                     CircleAvatar(
                                       radius: 12,
-                                      child: Text('${asyncSnapshot.data!}'),
+                                      child: asyncSnapshot.data! < 99
+                                          ? Text(
+                                              '${asyncSnapshot.data!}',
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                              ),
+                                            )
+                                          : const Text(
+                                              '99+',
+                                              style: TextStyle(fontSize: 10),
+                                            ),
                                     ),
                                 ],
                               );

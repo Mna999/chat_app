@@ -16,9 +16,7 @@ class UsersRepo {
   Future<void> saveUserDate(User user) async {
     await fireStore.doc(user.id).set({
       'lastSeen': FieldValue.serverTimestamp(),
-      'isOnline':true
-      
-    },SetOptions(merge: true));
+    }, SetOptions(merge: true));
   }
 
   Future<Map<String, dynamic>> loadUser() async {

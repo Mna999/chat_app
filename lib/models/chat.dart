@@ -6,12 +6,14 @@ class Chat {
   String id;
   String title;
   Message? lastMessage;
+  bool isTyping;
 
   Chat({
     required this.id,
     required this.title,
     required this.friend,
     this.lastMessage,
+    required this.isTyping
   });
 
   factory Chat.fromJson(Map<String, dynamic> json) {
@@ -23,13 +25,26 @@ class Chat {
           json['lastMessage'] != null &&
               (json['lastMessage'] as Map<String, dynamic>).isNotEmpty
           ? Message.fromJson(json['lastMessage'])
-          : Message(isSeen: false,
-          id: '',
+          : Message(
+              isSeen: false,
+              id: '',
               content: '',
               timeSent: DateTime.now(),
-              from: User(id: '', username: '', email: '',lastActive: DateTime.now(),isOnline: true),
-              to: User(id: '', username: '', email: '',lastActive: DateTime.now(),isOnline: true),
+              from: User(
+                id: '',
+                username: '',
+                email: '',
+                lastActive: DateTime.now(),
+              ),
+              to: User(
+                id: '',
+                username: '',
+                email: '',
+                lastActive: DateTime.now(),
+              ),
+              
             ),
+            isTyping: json['isTyping']
     );
   }
 
@@ -39,8 +54,7 @@ class Chat {
       'title': title,
       'friend': friend.toJson(),
       'lastMessage': lastMessage != null ? lastMessage!.toJson() : {},
+       'isTyping': isTyping ,
     };
   }
-
-
 }

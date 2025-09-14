@@ -22,4 +22,12 @@ class ChatsController {
     else
       return Chat.fromJson(json);
   }
+
+  void setTyping(Chat chat, bool value) async {
+    await chatsRepo.setTyping(chat, value);
+  }
+
+  Stream<bool> getIsTyping(Chat chat,String id) {
+    return chatsRepo.isTypingStream(chat,id);
+  }
 }

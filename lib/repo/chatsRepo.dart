@@ -85,6 +85,7 @@ class ChatsRepo {
       title: chat.title,
       friend: me,
       lastMessage: chat.lastMessage,
+      isTyping: false,
     );
 
     await FirebaseFirestore.instance
@@ -124,5 +125,34 @@ class ChatsRepo {
     print("🔥 Disposing ChatsRepo - cancelling subscription");
     _chatsSubscription?.cancel();
     _chatsController.close();
+  }
+
+  Future<void> setTyping(Chat chat, bool value) async {
+    if (chat.id == '1') {
+      print('its 1');
+      return;
+    }
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(chat.friend.id)
+        .collection('chats')
+        .doc(chat.id)
+        .set({'isTyping': value}, SetOptions(merge: true));
+  }
+
+  Stream<bool> isTypingStream(Chat chat, String id) {
+  if (id == "") return Stream.value(false);
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(id)
+      .collection('chats')
+      .doc(chat.id)
+      .snapshots()
+      .map((doc) {
+        final data = doc.data();
+        if (data == null) return false;
+        return data['isTyping'] ?? false;
+      });
   }
 }

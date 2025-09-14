@@ -50,7 +50,7 @@ class PresenceHandler with WidgetsBindingObserver {
         email: _currentUser!.email,
         profilePictureUrl: _currentUser!.profilePictureUrl,
         lastActive: DateTime.now(),
-        isOnline: true, // Always true while sending heartbeat
+  
       ),
     );
   }

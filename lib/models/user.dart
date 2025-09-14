@@ -7,14 +7,13 @@ class User {
   String email;
   String? profilePictureUrl;
   DateTime lastActive;
-  bool isOnline;
 
   User({
     required this.id,
     required this.username,
     required this.email,
     required this.lastActive,
-    required this.isOnline,
+
     this.profilePictureUrl,
   });
 
@@ -27,7 +26,6 @@ class User {
       lastActive: json['lastSeen'] != null
           ? (json['lastSeen'] as Timestamp).toDate()
           : DateTime.now(),
-      isOnline: json['isOnline'] ?? false,
     );
   }
   Map<String, dynamic> toJson() {

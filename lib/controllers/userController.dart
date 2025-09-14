@@ -46,4 +46,6 @@ class UserController {
   Stream<User> streamUser(String id) {
     return repo.userStream(id).map((event) => User.fromJson(event));
   }
+
+
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_app/controllers/chatController.dart';
 import 'package:chat_app/models/chat.dart';
 import 'package:chat_app/models/messages.dart';
@@ -71,5 +73,40 @@ class MessagesRepo {
         .where('to.id', isEqualTo: me.id)
         .where('isSeen', isEqualTo: false)
         .snapshots();
+  }
+
+  Future<void> removeMessageForMe(Chat chat, String id) async {
+    await fireStore.doc(chat.id).collection('messages').doc(id).delete();
+  }
+
+  Future<void> removeMessageForAll(Chat chat, String id) async {
+    await fireStore.doc(chat.id).collection('messages').doc(id).update({
+      'isDeleted': true,
+    });
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(chat.friend.id)
+        .collection('chats')
+        .doc(chat.id)
+        .collection('messages')
+        .doc(id)
+        .update({'isDeleted': true});
+  }
+
+  Future<void> editMessage(Chat chat, Message message, String content) async {
+    log('===========${message.id}');
+    await fireStore.doc(chat.id).collection('messages').doc(message.id).update({
+      'content': content,
+    });
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(chat.friend.id)
+        .collection('chats')
+        .doc(chat.id)
+        .collection('messages')
+        .doc(message.id)
+        .update({'content': content});
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:chat_app/models/messages.dart';
 import 'package:chat_app/models/user.dart';
 
@@ -7,17 +9,19 @@ class Chat {
   String title;
   Message? lastMessage;
   bool isTyping;
+  bool isDeleted;
 
   Chat({
     required this.id,
     required this.title,
     required this.friend,
+    required this.isDeleted,
     this.lastMessage,
-    required this.isTyping
+    required this.isTyping,
   });
 
   factory Chat.fromJson(Map<String, dynamic> json) {
-    return Chat(
+    return Chat(isDeleted: json['isDeleted'],
       id: json['id'],
       title: json['title'],
       friend: User.fromJson(json['friend']),
@@ -29,6 +33,7 @@ class Chat {
               isSeen: false,
               id: '',
               content: '',
+              isDeleted: false,
               timeSent: DateTime.now(),
               from: User(
                 id: '',
@@ -41,10 +46,11 @@ class Chat {
                 username: '',
                 email: '',
                 lastActive: DateTime.now(),
+                
               ),
               
             ),
-            isTyping: json['isTyping']
+      isTyping: json['isTyping'],
     );
   }
 
@@ -54,7 +60,19 @@ class Chat {
       'title': title,
       'friend': friend.toJson(),
       'lastMessage': lastMessage != null ? lastMessage!.toJson() : {},
-       'isTyping': isTyping ,
+      'isTyping': isTyping,
+      'isDeleted':isDeleted
     };
+  }
+
+  Chat copyWith({required Message lastMessage}) {
+    return Chat(
+      id: id,
+      title: title,
+      friend: friend,
+      lastMessage: lastMessage,
+      isTyping: isTyping,
+      isDeleted: isDeleted
+    );
   }
 }

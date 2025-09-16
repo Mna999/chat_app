@@ -149,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Chat? res = await chatsController.getChat(friend);
                     Chat chat =
                         res ??
-                        Chat(
+                        Chat(isDeleted: false,
                           id: '1',
                           title: '',
                           friend: friend,
@@ -234,6 +234,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ConnectionState.active &&
                                         asyncSnapshot.data!
                                     ? 'Typing...'
+                                    : snapshot
+                                          .data![index]
+                                          .lastMessage!
+                                          .isDeleted
+                                    ? '🚫 This message was deleted'
                                     : snapshot
                                               .data![index]
                                               .lastMessage!

@@ -15,6 +15,7 @@ class MessagesController {
   }
 
   Stream<List<Message>> getMessages(Chat chat) {
+    print(chat.id);
     return messagesRepo.getMessages(chat).map((event) {
       final messages = event.map((e) {
         final msg = Message.fromJson(e);
@@ -24,7 +25,19 @@ class MessagesController {
     });
   }
 
-  Stream<int> unseenCount(Chat chat,User me) {
-    return messagesRepo.unSeenCount(chat,me).map((event) => event.docs.length);
+  Stream<int> unseenCount(Chat chat, User me) {
+    return messagesRepo.unSeenCount(chat, me).map((event) => event.docs.length);
+  }
+
+  void deleteForMe(Chat chat, String id) async {
+    await messagesRepo.removeMessageForMe(chat, id);
+  }
+
+  void deleteForAll(Chat chat, String id) async {
+    await messagesRepo.removeMessageForAll(chat, id);
+  }
+
+  void editMessage(Chat chat, Message message, String content) async {
+    await messagesRepo.editMessage(chat, message, content);
   }
 }

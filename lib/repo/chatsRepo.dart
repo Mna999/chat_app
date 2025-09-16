@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chat_app/models/chat.dart';
+import 'package:chat_app/models/messages.dart';
 import 'package:chat_app/models/user.dart' show User;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
@@ -40,27 +41,30 @@ class ChatsRepo {
 
     print("🔥 Setting up new chats stream for user: ${currentUser.uid}");
 
-    _chatsSubscription = store.snapshots().listen(
-      (snapShot) {
-        final data = snapShot.docs
-            .map((doc) => doc.data() as Map<String, dynamic>)
-            .toList();
-        print("🔥 Chats snapshot received: ${data.length} chats");
+    _chatsSubscription = store
+        .where('isDeleted', isEqualTo: false)
+        .snapshots()
+        .listen(
+          (snapShot) {
+            final data = snapShot.docs
+                .map((doc) => doc.data() as Map<String, dynamic>)
+                .toList();
+            print("🔥 Chats snapshot received: ${data.length} chats");
 
-        if (!_chatsController.isClosed) {
-          _chatsController.add(data);
-        }
-      },
-      onError: (error) {
-        print("🔥 Chats stream error: $error");
-        if (!_chatsController.isClosed) {
-          _chatsController.addError(error);
-        }
-      },
-      onDone: () {
-        print("🔥 Chats stream closed");
-      },
-    );
+            if (!_chatsController.isClosed) {
+              _chatsController.add(data);
+            }
+          },
+          onError: (error) {
+            print("🔥 Chats stream error: $error");
+            if (!_chatsController.isClosed) {
+              _chatsController.addError(error);
+            }
+          },
+          onDone: () {
+            print("🔥 Chats stream closed");
+          },
+        );
 
     return _chatsController.stream;
   }
@@ -81,6 +85,7 @@ class ChatsRepo {
     await docRef.set(chat.toJson(), SetOptions(merge: true));
 
     Chat friendChat = Chat(
+      isDeleted: false,
       id: chat.id,
       title: chat.title,
       friend: me,
@@ -132,27 +137,77 @@ class ChatsRepo {
       print('its 1');
       return;
     }
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(chat.friend.id)
-        .collection('chats')
-        .doc(chat.id)
-        .set({'isTyping': value}, SetOptions(merge: true));
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(chat.friend.id)
+          .collection('chats')
+          .doc(chat.id)
+          .update({'isTyping': value});
+    } catch (e) {
+      print(e);
+    }
   }
 
   Stream<bool> isTypingStream(Chat chat, String id) {
-  if (id == "") return Stream.value(false);
-  return FirebaseFirestore.instance
-      .collection('users')
-      .doc(id)
-      .collection('chats')
-      .doc(chat.id)
-      .snapshots()
-      .map((doc) {
-        final data = doc.data();
-        if (data == null) return false;
-        return data['isTyping'] ?? false;
-      });
+    if (id == "") return Stream.value(false);
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .collection('chats')
+        .doc(chat.id)
+        .snapshots()
+        .map((doc) {
+          final data = doc.data();
+          if (data == null) return false;
+          return data['isTyping'] ?? false;
+        });
+  }
+
+  Future<void> deleteChat(String id) async {
+    await fireStore!.doc(id).delete();
+  }
+
+  Future<void> updateLastMessage(
+    Chat chat,
+    Message message, {
+    required bool forFriend,
+  }) async {
+    await fireStore!.doc(chat.id).update({'lastMessage': message.toJson()});
+    if (forFriend) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(chat.friend.id)
+          .collection('chats')
+          .doc(chat.id)
+          .update({'lastMessage': message.toJson()});
+    }
+  }
+
+  Future<void> setDeleted(bool isDeleted, Chat chat) async {
+    if (isDeleted)
+      await _deleteCollection(fireStore!.doc(chat.id).collection('messages'));
+    await fireStore!.doc(chat.id).update({'isDeleted': isDeleted});
+  }
+
+  Future<void> _deleteCollection(
+    CollectionReference collectionRef, {
+    int batchSize = 20,
+  }) async {
+    QuerySnapshot snapshot = await collectionRef.limit(batchSize).get();
+
+    if (snapshot.docs.isEmpty) {
+      return;
+    }
+
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    for (var doc in snapshot.docs) {
+      batch.delete(doc.reference);
+    }
+
+    await batch.commit();
+
+    await _deleteCollection(collectionRef, batchSize: batchSize);
   }
 }

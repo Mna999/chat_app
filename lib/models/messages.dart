@@ -12,6 +12,7 @@ class Message {
   MessageType messageType;
   bool isSeen;
   String id;
+  bool isDeleted;
 
   Message({
     required this.content,
@@ -20,6 +21,7 @@ class Message {
     required this.to,
     required this.isSeen,
     required this.id,
+    required this.isDeleted,
     this.messageType = MessageType.text,
   });
 
@@ -31,19 +33,21 @@ class Message {
       from: User.fromJson(json['from']),
       to: User.fromJson(json['to']),
       id: json['id'],
+      isDeleted: json['isDeleted'],
       messageType: MessageType.text,
     );
   }
 
-  Map<String, dynamic>  toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'content': content,
-      'timeSent': timeSent,
       'from': from.toJson(),
       'to': to.toJson(),
       'id': id,
-      'isSeen':isSeen,
+      'isSeen': isSeen,
+      'isDeleted': isDeleted,
       'messageType': 'text',
+      'timeSent': Timestamp.fromDate(timeSent),
     };
   }
 

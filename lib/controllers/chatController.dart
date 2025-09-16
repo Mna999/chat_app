@@ -1,4 +1,5 @@
 import 'package:chat_app/models/chat.dart';
+import 'package:chat_app/models/messages.dart';
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/repo/chatsRepo.dart';
 
@@ -27,7 +28,19 @@ class ChatsController {
     await chatsRepo.setTyping(chat, value);
   }
 
-  Stream<bool> getIsTyping(Chat chat,String id) {
-    return chatsRepo.isTypingStream(chat,id);
+  Stream<bool> getIsTyping(Chat chat, String id) {
+    return chatsRepo.isTypingStream(chat, id);
+  }
+
+  Future<void> deleteChat(String id) async {
+    await chatsRepo.deleteChat(id);
+  }
+
+  void updateLastMessage(Chat chat, Message message, {required bool forFriend}) async {
+    await chatsRepo.updateLastMessage(chat, message,forFriend: forFriend);
+  }
+
+  void setIsDeleted(bool isDeleted, Chat chat) async {
+    await chatsRepo.setDeleted(isDeleted, chat);
   }
 }

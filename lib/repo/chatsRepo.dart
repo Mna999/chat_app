@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:chat_app/models/chat.dart';
 import 'package:chat_app/models/messages.dart';
@@ -173,14 +174,17 @@ class ChatsRepo {
     Message message, {
     required bool forFriend,
   }) async {
-    await fireStore!.doc(chat.id).update({'lastMessage': message.toJson()});
+    log(chat.id);
+    await fireStore!.doc(chat.id).set({
+      'lastMessage': message.toJson(),
+    }, SetOptions(merge: true));
     if (forFriend) {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(chat.friend.id)
           .collection('chats')
           .doc(chat.id)
-          .update({'lastMessage': message.toJson()});
+          .set({'lastMessage': message.toJson()}, SetOptions(merge: true));
     }
   }
 

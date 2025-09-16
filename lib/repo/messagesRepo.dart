@@ -17,14 +17,13 @@ class MessagesRepo {
     String messageId = fireStore.doc(chat.id).collection('messages').doc().id;
     message.id = messageId;
     chat.lastMessage = message;
-    chat.lastMessage!.isSeen = false;
+    ChatsController().saveChat(chat, me);
 
-    await ChatsController().saveChat(chat, me);
-
-    await fireStore.doc(chat.id).collection('messages').doc(message.id).set({
-      ...message.toJson(),
-      'timeSent': FieldValue.serverTimestamp(),
-    });
+    await fireStore
+        .doc(chat.id)
+        .collection('messages')
+        .doc(message.id)
+        .set(message.toJson());
     await FirebaseFirestore.instance
         .collection('users')
         .doc(chat.friend.id)
@@ -32,11 +31,15 @@ class MessagesRepo {
         .doc(chat.id)
         .collection('messages')
         .doc(message.id)
-        .set({...message.toJson(), 'timeSent': FieldValue.serverTimestamp()});
+        .set(message.toJson());
   }
 
-  Future<void> setSeen(Chat chat, User me, Message message) async {
-    await ChatsController().saveChat(chat, me);
+  Future<void> setSeen(Chat chat, User me, Message message, bool isLast) async {
+    message.isSeen = true;
+    if (isLast) {
+      log('entered');
+      ChatsController().updateLastMessage(chat, message, forFriend: true);
+    }
     await fireStore.doc(chat.id).collection('messages').doc(message.id).update({
       'isSeen': true,
     });

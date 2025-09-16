@@ -6,7 +6,7 @@ class BubbleNormal extends StatelessWidget {
   final double bubbleRadius;
   final bool isSender;
   final Color color;
-  final Widget child; 
+  final Widget child;
   final Widget? time;
   final bool tail;
   final bool sent;
@@ -23,8 +23,8 @@ class BubbleNormal extends StatelessWidget {
   final VoidCallback? onLongPress;
 
   const BubbleNormal({
-    Key? key,
-    required this.child, 
+    super.key,
+    required this.child,
     this.time,
     this.constraints,
     this.margin = EdgeInsets.zero,
@@ -41,11 +41,8 @@ class BubbleNormal extends StatelessWidget {
     this.onLongPress,
     this.leading,
     this.trailing,
-    this.timeTextStyle = const TextStyle(
-      color: Colors.black54,
-      fontSize: 11,
-    ),
-  }) : super(key: key);
+    this.timeTextStyle = const TextStyle(color: Colors.black54, fontSize: 11),
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +54,19 @@ class BubbleNormal extends StatelessWidget {
     }
     if (delivered) {
       stateTick = true;
-      stateIcon =
-          const Icon(Icons.done_all, size: 18, color: Color(0xFF97AD8E));
+      stateIcon = const Icon(
+        Icons.done_all,
+        size: 18,
+        color: Color(0xFF97AD8E),
+      );
     }
     if (seen) {
       stateTick = true;
-      stateIcon =
-          const Icon(Icons.done_all, size: 18, color: Color(0xFF92DEDA));
+      stateIcon = const Icon(
+        Icons.done_all,
+        size: 18,
+        color: Color(0xFF92DEDA),
+      );
     }
 
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -90,7 +93,8 @@ class BubbleNormal extends StatelessWidget {
         if (isSender) const Spacer(),
         Container(
           color: Colors.transparent,
-          constraints: constraints ??
+          constraints:
+              constraints ??
               BoxConstraints(maxWidth: MediaQuery.of(context).size.width * .8),
           margin: margin,
           padding: padding,
@@ -105,9 +109,11 @@ class BubbleNormal extends StatelessWidget {
                   topLeft: Radius.circular(bubbleRadius),
                   topRight: Radius.circular(bubbleRadius),
                   bottomLeft: Radius.circular(
-                      tail ? (isSender ? bubbleRadius : 0) : BUBBLE_RADIUS),
+                    tail ? (isSender ? bubbleRadius : 0) : BUBBLE_RADIUS,
+                  ),
                   bottomRight: Radius.circular(
-                      tail ? (isSender ? 0 : bubbleRadius) : BUBBLE_RADIUS),
+                    tail ? (isSender ? 0 : bubbleRadius) : BUBBLE_RADIUS,
+                  ),
                 ),
               ),
               child: Stack(
@@ -119,8 +125,8 @@ class BubbleNormal extends StatelessWidget {
                       (isSender && (stateTick || time != null))
                           ? 50
                           : (!isSender && time != null)
-                              ? 50
-                              : 12,
+                          ? 50
+                          : 12,
                       6,
                     ),
                     child: child, // <-- render whatever widget passed

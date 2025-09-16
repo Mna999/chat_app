@@ -9,6 +9,7 @@ import 'package:chat_app/models/chat.dart';
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/screens/chatScreen.dart';
 import 'package:chat_app/screens/loginScreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -145,12 +146,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 return ListTile(
                   title: Text(friend.username),
                   subtitle: Text(friend.email),
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    backgroundImage:
+                        friend.profilePictureUrl == '' ||
+                            friend.profilePictureUrl == null
+                        ? const AssetImage(
+                            'assets/images/chatApp ui ux/icons8-user-50.png',
+                          )
+                        : NetworkImage(friend.profilePictureUrl!),
+                  ),
                   onTap: () async {
                     Chat? res = await chatsController.getChat(friend);
                     Chat chat =
                         res ??
-                        Chat(isDeleted: false,
-                          id: '1',
+                        Chat(
+                          isDeleted: false,
+                          id: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(user.id)
+                              .collection('chats')
+                              .doc()
+                              .id,
                           title: '',
                           friend: friend,
                           isTyping: false,
@@ -226,36 +243,42 @@ class _HomeScreenState extends State<HomeScreen> {
                               user.id,
                             ),
                             builder: (context, asyncSnapshot) {
-                              return Text(
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                asyncSnapshot.data != null &&
-                                        asyncSnapshot.connectionState ==
-                                            ConnectionState.active &&
-                                        asyncSnapshot.data!
-                                    ? 'Typing...'
-                                    : snapshot
-                                          .data![index]
-                                          .lastMessage!
-                                          .isDeleted
-                                    ? '🚫 This message was deleted'
-                                    : snapshot
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    asyncSnapshot.data != null &&
+                                            asyncSnapshot.connectionState ==
+                                                ConnectionState.active &&
+                                            asyncSnapshot.data!
+                                        ? 'Typing...'
+                                        : snapshot
                                               .data![index]
                                               .lastMessage!
-                                              .from
-                                              .id ==
-                                          user.id
-                                    ? ' me : ${snapshot.data![index].lastMessage!.content}'
-                                    : '${snapshot.data![index].lastMessage!.from.username} : ${snapshot.data![index].lastMessage!.content}',
-                                style: TextStyle(
-                                  color:
-                                      asyncSnapshot.data != null &&
-                                          asyncSnapshot.connectionState ==
-                                              ConnectionState.active &&
-                                          asyncSnapshot.data!
-                                      ? Colors.blue
-                                      : Colors.grey,
-                                ),
+                                              .isDeleted
+                                        ? '🚫 This message was deleted'
+                                        : snapshot
+                                                  .data![index]
+                                                  .lastMessage!
+                                                  .from
+                                                  .id ==
+                                              user.id
+                                        ? ' me : ${snapshot.data![index].lastMessage!.content}'
+                                        : '${snapshot.data![index].lastMessage!.from.username} : ${snapshot.data![index].lastMessage!.content}',
+                                    style: TextStyle(
+                                      color:
+                                          asyncSnapshot.data != null &&
+                                              asyncSnapshot.connectionState ==
+                                                  ConnectionState.active &&
+                                              asyncSnapshot.data!
+                                          ? Colors.blue
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15),
+                                ],
                               );
                             },
                           ),
@@ -294,6 +317,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                               style: TextStyle(fontSize: 10),
                                             ),
                                     ),
+
+                                  if (snapshot
+                                              .data![index]
+                                              .lastMessage!
+                                              .from
+                                              .id ==
+                                          user.id &&
+                                      !snapshot
+                                          .data![index]
+                                          .lastMessage!
+                                          .isDeleted &&
+                                      !snapshot.data![index].isTyping)
+                                    snapshot.data![index].lastMessage!.isSeen
+                                        ? const Icon(
+                                            Icons.done_all,
+                                            color: Colors.blue,
+                                            size: 17,
+                                          )
+                                        : const Icon(
+                                            Icons.done,
+                                            color: Colors.grey,
+                                            size: 17,
+                                          ),
                                 ],
                               );
                             },

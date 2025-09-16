@@ -11,11 +11,12 @@ import 'package:chat_app/models/user.dart';
 import 'package:chat_app/providers/textProvider.dart';
 import 'package:chat_app/screens/chatBubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:google_fonts/google_fonts.dart' hide Config;
 import 'package:text_scroll/text_scroll.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -39,6 +40,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   bool isOnline = true;
   FocusNode focusNode = FocusNode();
   bool isEditing = false;
+  bool showEmojies = false;
 
   @override
   void initState() {
@@ -60,6 +62,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   String prevText = '';
   @override
   Widget build(BuildContext context) {
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+
+    if (isKeyboardVisible && showEmojies) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() => showEmojies = false);
+        }
+      });
+    }
     return Scaffold(
       backgroundColor: const Color.fromARGB(28, 156, 158, 255),
       appBar: AppBar(
@@ -364,11 +375,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
                 Expanded(
                   child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
+                    onPressed: () {
+                      showEmojies = !showEmojies;
+                      if (showEmojies == true) {
+                        focusNode.unfocus();
+                      } else {
+                        focusNode.requestFocus();
+                      }
+                      setState(() {});
+                    },
+                    icon: Icon(
                       Icons.emoji_emotions_outlined,
                       size: 28,
-                      color: Colors.grey,
+                      color: showEmojies ? Colors.blue : Colors.grey,
                     ),
                   ),
                 ),
@@ -400,6 +419,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                     message,
                                     widget.me,
                                   );
+
+                                  chatsController.setTyping(widget.chat, false);
                                   if (widget.chat.isDeleted) {
                                     chatsController.setIsDeleted(
                                       false,
@@ -443,6 +464,39 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ],
             ),
           ),
+          if (showEmojies)
+            EmojiPicker(
+              onEmojiSelected: (_, __) {
+                ref.read(textProvider.notifier).setText(messageController.text);
+              },
+              onBackspacePressed: () {
+                ref.read(textProvider.notifier).setText(messageController.text);
+              },
+              textEditingController: messageController,
+              config: const Config(
+                height: 256,
+                checkPlatformCompatibility: true,
+                emojiViewConfig: EmojiViewConfig(
+                  backgroundColor: Color(0xFF1E1E1E),
+                  columns: 8,
+                  emojiSizeMax: 28,
+                ),
+                categoryViewConfig: CategoryViewConfig(
+                  backgroundColor: Color(0xFF2C2C2C),
+                  iconColor: Colors.grey,
+                  iconColorSelected: Colors.blue,
+                  indicatorColor: Colors.blue,
+                ),
+                bottomActionBarConfig: BottomActionBarConfig(
+                  backgroundColor: Color(0xFF2C2C2C),
+                  buttonColor: Colors.transparent,
+                  buttonIconColor: Colors.blue,
+                ),
+                searchViewConfig: SearchViewConfig(
+                  backgroundColor: Color(0xFF1E1E1E),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -479,7 +533,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           }
 
           if (message.to.id == widget.me.id && !message.isSeen) {
-            messagesController.setSeen(widget.chat, widget.me, message);
+            messagesController.setSeen(
+              widget.chat,
+              widget.me,
+              message,
+              messagesData.last.id == message.id,
+            );
           }
 
           return Column(

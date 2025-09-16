@@ -10,8 +10,8 @@ class MessagesController {
     await messagesRepo.addMessage(chat, message, me);
   }
 
-  void setSeen(Chat chat, User me, Message message) async {
-    await messagesRepo.setSeen(chat, me, message);
+  void setSeen(Chat chat, User me, Message message,bool isLast) async {
+    await messagesRepo.setSeen(chat, me, message,isLast);
   }
 
   Stream<List<Message>> getMessages(Chat chat) {

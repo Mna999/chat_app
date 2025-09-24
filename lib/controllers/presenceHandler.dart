@@ -41,7 +41,7 @@ class PresenceHandler with WidgetsBindingObserver {
 
   /// Always updates lastSeen + online heartbeat
   Future<void> _sendHeartbeat() async {
-    if (_currentUser == null) return;
+    if (_currentUser == null||_currentUser!.id=='') return;
 
     await _userController.saveUserDate(
       User(
@@ -50,6 +50,7 @@ class PresenceHandler with WidgetsBindingObserver {
         email: _currentUser!.email,
         profilePictureUrl: _currentUser!.profilePictureUrl,
         lastActive: DateTime.now(),
+     
   
       ),
     );

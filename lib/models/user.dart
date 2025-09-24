@@ -6,6 +6,7 @@ class User {
   String username;
   String email;
   String? profilePictureUrl;
+  String? bio;
   DateTime lastActive;
 
   User({
@@ -13,7 +14,7 @@ class User {
     required this.username,
     required this.email,
     required this.lastActive,
-
+    this.bio,
     this.profilePictureUrl,
   });
 
@@ -26,6 +27,7 @@ class User {
       lastActive: json['lastSeen'] != null
           ? (json['lastSeen'] as Timestamp).toDate()
           : DateTime.now(),
+      bio: json['bio'] ?? '...',
     );
   }
   Map<String, dynamic> toJson() {
@@ -34,6 +36,7 @@ class User {
       'username': username,
       'email': email,
       'profilePictureUrl': profilePictureUrl,
+      'bio': bio,
     };
   }
 
@@ -43,11 +46,9 @@ class User {
     Duration diffDays = now.difference(lastActive);
 
     if (diffDays.inMinutes < 1) {
-      // 🔹 Today → show "Today at <time>"
-
       return 'Online';
       // e.g. Today at 3:45 PM
-    } else if (diffDays.inMinutes >= 1) {
+    } else if (diffDays.inMinutes > 1 && diffDays.inDays < 1) {
       return 'Last Seen: Today at ${DateFormat.jm().format(lastActive)}';
     } else if (diffDays.inDays == 1) {
       return 'Last Seen: Yesterday at ${DateFormat.jm().format(lastActive)}';

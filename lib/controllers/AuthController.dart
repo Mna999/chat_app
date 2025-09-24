@@ -57,6 +57,7 @@ class AuthController {
       email: userCredential.user!.email ?? '',
       profilePictureUrl: '',
       lastActive: DateTime.now(),
+      bio: ''
 
     );
     await userController.saveUser(user);

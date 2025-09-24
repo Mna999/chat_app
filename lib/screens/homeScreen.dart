@@ -14,7 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key, required this.user});
+  User user;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -25,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   AuthController authController = AuthController();
   ChatsController chatsController = ChatsController();
   MessagesController messagesController = MessagesController();
-  User user = User(id: '', username: '', email: '', lastActive: DateTime.now());
+
   bool isLoggingOut = false;
   final PresenceHandler _presenceHandler = PresenceHandler();
 
@@ -42,9 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void loadUser() async {
-    user = await userController.loadUser();
-    userController.saveUserDate(user);
-    _presenceHandler.init(user);
+    _presenceHandler.init(widget.user);
     setState(() {});
   }
 
@@ -135,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               final results = await userController.searchUser(
                 controller.text.toLowerCase(),
-                user,
+                widget.user,
               );
 
               if (results.isEmpty) {
@@ -164,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           isDeleted: false,
                           id: FirebaseFirestore.instance
                               .collection('users')
-                              .doc(user.id)
+                              .doc(widget.user.id)
                               .collection('chats')
                               .doc()
                               .id,
@@ -176,7 +175,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ChatScreen(chat: chat, me: user),
+                        builder: (context) =>
+                            ChatScreen(chat: chat, me: widget.user),
                       ),
                     );
                   },
@@ -240,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           subtitle: StreamBuilder(
                             stream: chatsController.getIsTyping(
                               snapshot.data![index],
-                              user.id,
+                              widget.user.id,
                             ),
                             builder: (context, asyncSnapshot) {
                               return Row(
@@ -264,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   .lastMessage!
                                                   .from
                                                   .id ==
-                                              user.id
+                                              widget.user.id
                                         ? ' me : ${snapshot.data![index].lastMessage!.content}'
                                         : '${snapshot.data![index].lastMessage!.from.username} : ${snapshot.data![index].lastMessage!.content}',
                                     style: TextStyle(
@@ -285,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           trailing: StreamBuilder(
                             stream: messagesController.unseenCount(
                               snapshot.data![index],
-                              user,
+                              widget.user,
                             ),
                             builder: (context, asyncSnapshot) {
                               return Column(
@@ -323,7 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               .lastMessage!
                                               .from
                                               .id ==
-                                          user.id &&
+                                          widget.user.id &&
                                       !snapshot
                                           .data![index]
                                           .lastMessage!
@@ -376,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               MaterialPageRoute(
                                 builder: (context) => ChatScreen(
                                   chat: snapshot.data![index],
-                                  me: user,
+                                  me: widget.user,
                                 ),
                               ),
                             );

@@ -472,6 +472,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               onBackspacePressed: () {
                 ref.read(textProvider.notifier).setText(messageController.text);
               },
+              
               textEditingController: messageController,
               config: const Config(
                 height: 256,
@@ -486,6 +487,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   iconColor: Colors.grey,
                   iconColorSelected: Colors.blue,
                   indicatorColor: Colors.blue,
+                  
                 ),
                 bottomActionBarConfig: BottomActionBarConfig(
                   backgroundColor: Color(0xFF2C2C2C),
@@ -494,6 +496,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
                 searchViewConfig: SearchViewConfig(
                   backgroundColor: Color(0xFF1E1E1E),
+                  
                 ),
               ),
             ),

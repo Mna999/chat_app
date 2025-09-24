@@ -1,7 +1,7 @@
 import 'package:chat_app/controllers/AuthController.dart';
 import 'package:chat_app/providers/ThemeModeProvider.dart';
 import 'package:chat_app/providers/loadingProviderAuth.dart';
-import 'package:chat_app/screens/homeScreen.dart';
+import 'package:chat_app/screens/homeScreenNav.dart';
 import 'package:chat_app/screens/signupScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
@@ -164,8 +164,7 @@ class Loginscreen extends ConsumerWidget {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            const HomeScreen(),
+                                        builder: (context) => HomescreenNav(),
                                       ),
                                     );
                                   }
@@ -269,7 +268,7 @@ class Loginscreen extends ConsumerWidget {
                             if (log)
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                  builder: (context) => const HomeScreen(),
+                                  builder: (context) => HomescreenNav(),
                                 ),
                               );
                           },

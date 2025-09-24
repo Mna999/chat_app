@@ -1,7 +1,7 @@
 import 'package:chat_app/controllers/AuthController.dart';
 import 'package:chat_app/firebase_options.dart';
 import 'package:chat_app/providers/ThemeModeProvider.dart';
-import 'package:chat_app/screens/homeScreen.dart';
+import 'package:chat_app/screens/homeScreenNav.dart';
 import 'package:chat_app/screens/loginScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +17,7 @@ void main() async {
 class MyApp extends ConsumerWidget {
   MyApp({super.key});
   AuthController authController = AuthController();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ThemeMode themeMode = ref.watch(themeModeProvider);
@@ -24,15 +25,16 @@ class MyApp extends ConsumerWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
+
       // Light Theme
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
-        primaryColor: const Color(0xFF6366F1), // Blue from login button
+        primaryColor: const Color(0xFF6366F1),
         scaffoldBackgroundColor: const Color(0xFFFFFFFF),
         colorScheme: const ColorScheme.light(
-          primary: Color(0xFF6366F1), // Blue login button
-          secondary: Color(0xFF4CAF50), // Green accent
+          primary: Color(0xFF6366F1),
+          secondary: Color(0xFF4CAF50),
           surface: Color(0xFFFFFFFF),
           error: Color(0xFFE53E3E),
           onPrimary: Colors.white,
@@ -46,7 +48,7 @@ class MyApp extends ConsumerWidget {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF6366F1), // Blue like in design
+            backgroundColor: const Color(0xFF6366F1),
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -93,6 +95,15 @@ class MyApp extends ConsumerWidget {
           selectedItemColor: Color(0xFF6366F1),
           unselectedItemColor: Color(0xFF9CA3AF),
         ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFFFFFFFF), // matches ListTile background
+          surfaceTintColor: Colors.transparent,
+          elevation: 2,
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       ),
 
       // Dark Theme
@@ -102,8 +113,8 @@ class MyApp extends ConsumerWidget {
         primaryColor: const Color(0xFF6366F1),
         scaffoldBackgroundColor: const Color(0xFF000000),
         colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF6366F1), // Blue login button
-          secondary: Color(0xFF4CAF50), // Green accent
+          primary: Color(0xFF6366F1),
+          secondary: Color(0xFF4CAF50),
           surface: Color(0xFF1A1A1A),
           error: Color(0xFFE53E3E),
           onPrimary: Colors.white,
@@ -165,12 +176,22 @@ class MyApp extends ConsumerWidget {
           selectedItemColor: Color(0xFF6366F1),
           unselectedItemColor: Color(0xFF9CA3AF),
         ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFF1A1A1A), // matches ListTile background
+          surfaceTintColor: Colors.transparent,
+          elevation: 2,
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       ),
+
       themeMode: themeMode,
       home:
           authController.fireBaseAuth.currentUser != null &&
               authController.fireBaseAuth.currentUser!.emailVerified
-          ? const HomeScreen()
+          ? const HomescreenNav()
           : Loginscreen(),
     );
   }

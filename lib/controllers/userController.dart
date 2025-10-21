@@ -32,6 +32,10 @@ class UserController {
     return res;
   }
 
+  void updateUserForFriends(User user) async {
+    await repo.updateUserDataForChats(user);
+  }
+
   Future<bool> usernameExists(String username) async {
     final res = await repo.search(username);
     return res.isNotEmpty;
@@ -46,6 +50,4 @@ class UserController {
   Stream<User> streamUser(String id) {
     return repo.userStream(id).map((event) => User.fromJson(event));
   }
-
-
 }

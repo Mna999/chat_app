@@ -19,6 +19,21 @@ class UsersRepo {
     }, SetOptions(merge: true));
   }
 
+  Future<void> updateUserDataForChats(User user) async {
+    await saveUser(user);
+    final users = await fireStore.get();
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+    for (final users in users.docs) {
+      final chats = await users.reference
+          .collection("chats")
+          .where("friend.id", isEqualTo: user.id)
+          .get();
+      for (var chat in chats.docs) {
+        await chat.reference.update({"friend": user.toJson()});
+      }
+    }
+  }
+
   Future<Map<String, dynamic>> loadUser() async {
     final DocumentSnapshot<Map<String, dynamic>> snapshot = await fireStore
         .doc(FirebaseAuth.instance.currentUser!.uid)

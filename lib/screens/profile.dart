@@ -1,4 +1,5 @@
 import 'package:chat_app/models/user.dart';
+import 'package:chat_app/screens/editBottomSheet.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -36,37 +37,121 @@ class _ProfileState extends State<Profile> {
                 child: SizedBox(
                   width: double.infinity,
                   child: Card(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundColor: Colors.transparent,
-                          backgroundImage:
-                              widget.user.profilePictureUrl == '' ||
-                                  widget.user.profilePictureUrl == null
-                              ? const AssetImage(
-                                  'assets/images/chatApp ui ux/icons8-user-50.png',
-                                )
-                              : NetworkImage(widget.user.profilePictureUrl!),
-                        ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: CircleAvatar(
+                                  radius: 70,
 
-                        Center(
-                          child: ListTile(
-                            title: Center(
-                              child: Text(
-                                widget.user.username,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
+                                  backgroundColor: Colors.transparent,
+                                  backgroundImage:
+                                      widget.user.profilePictureUrl == '' ||
+                                          widget.user.profilePictureUrl == null
+                                      ? const AssetImage(
+                                          'assets/images/chatApp ui ux/icons8-user-50.png',
+                                        )
+                                      : NetworkImage(
+                                          widget.user.profilePictureUrl!,
+                                        ),
                                 ),
                               ),
-                            ),
-                            subtitle: Center(
-                              child: Text(widget.user.bio ?? '...'),
+                              if (widget.isMine)
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+
+                                  child: CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: Colors.transparent
+                                        .withAlpha(50),
+                                    child: IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.edit),
+                                      color: Colors.blueAccent,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+
+                          Center(
+                            child: ListTile(
+                              title: Center(
+                                child: Text(
+                                  widget.user.username,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              subtitle: Center(
+                                child: Text(widget.user.bio ?? '...'),
+                              ),
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Card(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Text(
+                            widget.user.username,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(widget.user.bio ?? '...'),
+                          trailing: widget.isMine
+                              ? IconButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      builder: (context) => Padding(
+                                        padding: EdgeInsets.only(
+                                          bottom: MediaQuery.of(
+                                            context,
+                                          ).viewInsets.bottom,
+                                        ),
+                                        child: SizedBox(
+                                          height:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
+                                              0.55,
+                                          child: Editbottomsheet(
+                                            user: widget.user,
+                                            state: () {
+                                              setState(() {});
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.edit),
+                                  color: Colors.blueAccent,
+                                )
+                              : null,
                         ),
                       ],
                     ),

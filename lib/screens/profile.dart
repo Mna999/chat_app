@@ -1,5 +1,8 @@
+import 'package:chat_app/controllers/AuthController.dart';
+import 'package:chat_app/controllers/presenceHandler.dart';
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/screens/editBottomSheet.dart';
+import 'package:chat_app/screens/loginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,6 +16,8 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  AuthController authController = AuthController();
+  final PresenceHandler _presenceHandler = PresenceHandler();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,6 +36,7 @@ class _ProfileState extends State<Profile> {
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 15),
               Center(
@@ -46,19 +52,23 @@ class _ProfileState extends State<Profile> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(15.0),
-                                child: CircleAvatar(
-                                  radius: 70,
+                                child: Hero(
+                                  tag: "pfp",
+                                  child: CircleAvatar(
+                                    radius: 70,
 
-                                  backgroundColor: Colors.transparent,
-                                  backgroundImage:
-                                      widget.user.profilePictureUrl == '' ||
-                                          widget.user.profilePictureUrl == null
-                                      ? const AssetImage(
-                                          'assets/images/chatApp ui ux/icons8-user-50.png',
-                                        )
-                                      : NetworkImage(
-                                          widget.user.profilePictureUrl!,
-                                        ),
+                                    backgroundColor: Colors.transparent,
+                                    backgroundImage:
+                                        widget.user.profilePictureUrl == '' ||
+                                            widget.user.profilePictureUrl ==
+                                                null
+                                        ? const AssetImage(
+                                            'assets/images/chatApp ui ux/icons8-user-50.png',
+                                          )
+                                        : NetworkImage(
+                                            widget.user.profilePictureUrl!,
+                                          ),
+                                  ),
                                 ),
                               ),
                               if (widget.isMine)
@@ -72,7 +82,7 @@ class _ProfileState extends State<Profile> {
                                         .withAlpha(50),
                                     child: IconButton(
                                       onPressed: () {},
-                                      icon: const Icon(Icons.edit),
+                                      icon: const Icon(Icons.camera_alt),
                                       color: Colors.blueAccent,
                                     ),
                                   ),
@@ -86,6 +96,7 @@ class _ProfileState extends State<Profile> {
                                 child: Text(
                                   widget.user.username,
                                   textAlign: TextAlign.center,
+
                                   style: const TextStyle(
                                     fontSize: 25,
                                     fontWeight: FontWeight.bold,
@@ -107,17 +118,28 @@ class _ProfileState extends State<Profile> {
               Card(
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(15.0),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 12,
+                    ),
                     child: Column(
                       children: [
+                        const Text(
+                          "Details",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
                         ListTile(
                           title: Text(
                             widget.user.username,
                             textAlign: TextAlign.start,
-                            style: const TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: const TextStyle(fontSize: 20),
                           ),
                           subtitle: Text(widget.user.bio ?? '...'),
                           trailing: widget.isMine
@@ -158,6 +180,21 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
               ),
+              const SizedBox(height: 40),
+              if (widget.isMine)
+                ElevatedButton(
+                  onPressed: () async {
+                    _presenceHandler.dispose();
+                    await authController.logOut();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Loginscreen()),
+                      (route) => true,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  child: const Text("Logout", style: TextStyle(fontSize: 17)),
+                ),
             ],
           ),
         ),

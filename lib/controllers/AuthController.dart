@@ -51,16 +51,18 @@ class AuthController {
       credential,
     );
 
-    final User user = User(
-      id: userCredential.user!.uid,
-      username: userCredential.user!.displayName ?? '',
-      email: userCredential.user!.email ?? '',
-      profilePictureUrl: '',
-      lastActive: DateTime.now(),
-      bio: ''
-
-    );
-    await userController.saveUser(user);
+    final tUser = await userController.getUserById(userCredential.user!.uid);
+    if (tUser == null) {
+      final User user = User(
+        id: userCredential.user!.uid,
+        username: userCredential.user!.displayName ?? '',
+        email: userCredential.user!.email ?? '',
+        profilePictureUrl: '',
+        lastActive: DateTime.now(),
+        bio: '',
+      );
+      await userController.saveUser(user);
+    }
     return true;
   }
 

@@ -10,6 +10,7 @@ import 'package:chat_app/models/messages.dart';
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/providers/textProvider.dart';
 import 'package:chat_app/screens/chatBubble.dart';
+import 'package:chat_app/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
@@ -199,6 +200,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ]
             : [],
         title: ListTile(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                    Profile(isMine: false, user: widget.chat.friend),
+              ),
+            );
+          },
           leading: Hero(
             tag: 'pfp',
             child: CircleAvatar(
@@ -472,7 +481,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               onBackspacePressed: () {
                 ref.read(textProvider.notifier).setText(messageController.text);
               },
-              
+
               textEditingController: messageController,
               config: const Config(
                 height: 256,
@@ -487,7 +496,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   iconColor: Colors.grey,
                   iconColorSelected: Colors.blue,
                   indicatorColor: Colors.blue,
-                  
                 ),
                 bottomActionBarConfig: BottomActionBarConfig(
                   backgroundColor: Color(0xFF2C2C2C),
@@ -496,7 +504,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
                 searchViewConfig: SearchViewConfig(
                   backgroundColor: Color(0xFF1E1E1E),
-                  
                 ),
               ),
             ),
@@ -604,7 +611,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       text: message.isDeleted
                           ? '🚫 This message was deleted'
                           : message.content,
-                      style: const TextStyle(fontSize: 16),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: message.isDeleted
+                            ? const Color.fromARGB(255, 204, 204, 204)
+                            : Colors.white,
+                      ),
                       linkStyle: const TextStyle(
                         overflow: TextOverflow.ellipsis,
                         color: Colors.white,

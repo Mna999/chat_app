@@ -38,6 +38,15 @@ class _EditbottomsheetState extends State<Editbottomsheet> {
             TextFormField(
               decoration: const InputDecoration(labelText: "Username"),
               controller: username,
+              validator: (val) {
+                if (val != null) {
+                  if (val.trim().isEmpty) {
+                    return "Please fill the field";
+                  }
+                }
+                return null;
+              },
+              autovalidateMode: AutovalidateMode.onUserInteraction,
             ),
             const SizedBox(height: 50),
             TextFormField(
@@ -49,13 +58,15 @@ class _EditbottomsheetState extends State<Editbottomsheet> {
               width: 200,
               child: ElevatedButton(
                 onPressed: () {
-                  var bioComp = widget.user.bio ?? "...";
-                  if (widget.user.username.trim() != username.text.trim() ||
-                      bioComp.trim() != bio.text.trim()) {
-                    widget.user.username = username.text.trim();
-                    widget.user.bio = bio.text.trim();
-                    userController.updateUserForFriends(widget.user);
-                    widget.state();
+                  if (formKey.currentState!.validate()) {
+                    var bioComp = widget.user.bio ?? "...";
+                    if (widget.user.username.trim() != username.text.trim() ||
+                        bioComp.trim() != bio.text.trim()) {
+                      widget.user.username = username.text.trim();
+                      widget.user.bio = bio.text.trim();
+                      userController.updateUserForFriends(widget.user);
+                      widget.state();
+                    }
                   }
                   Navigator.pop(context);
                 },

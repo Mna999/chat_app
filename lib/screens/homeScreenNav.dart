@@ -23,8 +23,15 @@ class _HomescreenNavState extends State<HomescreenNav> {
   PageController pageController = PageController();
   @override
   void initState() {
-    super.initState();    
+    super.initState();
     loadUser();
+  }
+
+  @override
+  void dispose() {
+    // Cancel the subscription and close the stream controller
+    _presenceHandler.dispose();
+    super.dispose();
   }
 
   void loadUser() async {

@@ -14,9 +14,13 @@ class UsersRepo {
   }
 
   Future<void> saveUserDate(User user) async {
-    await fireStore.doc(user.id).set({
-      'lastSeen': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+    try {
+      await fireStore.doc(user.id).set({
+        'lastSeen': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      return;
+    }
   }
 
   Future<void> updateUserDataForChats(User user) async {

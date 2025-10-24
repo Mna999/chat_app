@@ -41,8 +41,9 @@ class UserController {
     return res.isNotEmpty;
   }
 
-  Future<User> getUserById(String id) async {
+  Future<User?> getUserById(String id) async {
     Map<String, dynamic> json = await repo.getUserById(id);
+    if (json == {}) return null;
     User user = User.fromJson(json);
     return user;
   }

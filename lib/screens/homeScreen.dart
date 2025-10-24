@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _setupChatsStream();
   }
 
-  void loadUser() async {
+  void loadUser() {
     _presenceHandler.init(widget.user);
     setState(() {});
   }
@@ -243,42 +243,36 @@ class _HomeScreenState extends State<HomeScreen> {
                               widget.user.id,
                             ),
                             builder: (context, asyncSnapshot) {
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    asyncSnapshot.data != null &&
-                                            asyncSnapshot.connectionState ==
-                                                ConnectionState.active &&
-                                            asyncSnapshot.data!
-                                        ? 'Typing...'
-                                        : snapshot
+                              return Text(
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                asyncSnapshot.data != null &&
+                                        asyncSnapshot.connectionState ==
+                                            ConnectionState.active &&
+                                        asyncSnapshot.data!
+                                    ? 'Typing...'
+                                    : snapshot
+                                          .data![index]
+                                          .lastMessage!
+                                          .isDeleted
+                                    ? '🚫 This message was deleted'
+                                    : snapshot
                                               .data![index]
                                               .lastMessage!
-                                              .isDeleted
-                                        ? '🚫 This message was deleted'
-                                        : snapshot
-                                                  .data![index]
-                                                  .lastMessage!
-                                                  .from
-                                                  .id ==
-                                              widget.user.id
-                                        ? ' me : ${snapshot.data![index].lastMessage!.content}'
-                                        : '${snapshot.data![index].lastMessage!.from.username} : ${snapshot.data![index].lastMessage!.content}',
-                                    style: TextStyle(
-                                      color:
-                                          asyncSnapshot.data != null &&
-                                              asyncSnapshot.connectionState ==
-                                                  ConnectionState.active &&
-                                              asyncSnapshot.data!
-                                          ? Colors.blue
-                                          : Colors.grey,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 15),
-                                ],
+                                              .from
+                                              .id ==
+                                          widget.user.id
+                                    ? ' me : ${snapshot.data![index].lastMessage!.content}'
+                                    : '${snapshot.data![index].lastMessage!.from.username} : ${snapshot.data![index].lastMessage!.content}',
+                                style: TextStyle(
+                                  color:
+                                      asyncSnapshot.data != null &&
+                                          asyncSnapshot.connectionState ==
+                                              ConnectionState.active &&
+                                          asyncSnapshot.data!
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                ),
                               );
                             },
                           ),

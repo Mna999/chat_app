@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:chat_app/controllers/userController.dart';
 import 'package:chat_app/models/user.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/widgets.dart';
 
 class PresenceHandler with WidgetsBindingObserver {
@@ -12,6 +14,7 @@ class PresenceHandler with WidgetsBindingObserver {
 
   /// Initialize presence tracking
   void init(User user) {
+    if (user.id == '' || FirebaseAuth.instance.currentUser == null) return;
     _currentUser = user;
     WidgetsBinding.instance.addObserver(this);
 
@@ -41,7 +44,7 @@ class PresenceHandler with WidgetsBindingObserver {
 
   /// Always updates lastSeen + online heartbeat
   Future<void> _sendHeartbeat() async {
-    if (_currentUser == null||_currentUser!.id=='') return;
+    if (_currentUser == null || _currentUser!.id == '') return;
 
     await _userController.saveUserDate(
       User(
@@ -50,8 +53,6 @@ class PresenceHandler with WidgetsBindingObserver {
         email: _currentUser!.email,
         profilePictureUrl: _currentUser!.profilePictureUrl,
         lastActive: DateTime.now(),
-     
-  
       ),
     );
   }

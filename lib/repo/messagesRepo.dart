@@ -86,15 +86,18 @@ class MessagesRepo {
     await fireStore.doc(chat.id).collection('messages').doc(id).update({
       'isDeleted': true,
     });
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(chat.friend.id)
-        .collection('chats')
-        .doc(chat.id)
-        .collection('messages')
-        .doc(id)
-        .update({'isDeleted': true});
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(chat.friend.id)
+          .collection('chats')
+          .doc(chat.id)
+          .collection('messages')
+          .doc(id)
+          .update({'isDeleted': true});
+    } catch (e) {
+      log("dn");
+    }
   }
 
   Future<void> editMessage(Chat chat, Message message, String content) async {

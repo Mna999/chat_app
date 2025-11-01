@@ -70,6 +70,16 @@ class ChatsRepo {
     return _chatsController.stream;
   }
 
+  Future<List<Map<String, dynamic>>> getChatsForUser(User user) async {
+    final usersSnapshot = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(user.id)
+        .collection("chats")
+        .get();
+
+    return usersSnapshot.docs.map((e) => e.data()).toList();
+  }
+
   Future<void> saveChat(Chat chat, User me) async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {

@@ -10,6 +10,7 @@ import 'package:chat_app/models/messages.dart';
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/providers/textProvider.dart';
 import 'package:chat_app/screens/chatBubble.dart';
+import 'package:chat_app/screens/forwardSceen.dart';
 import 'package:chat_app/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
@@ -194,7 +195,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ),
 
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            Forwardsceen(user: widget.me, messages: selected),
+                      ),
+                    );
+                  },
                   icon: const Icon(Icons.arrow_forward_ios_rounded),
                 ),
               ]

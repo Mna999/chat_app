@@ -16,6 +16,14 @@ class ChatsController {
     );
   }
 
+  Future<List<Chat>> getChatsForUser(User user) async {
+    List<Map<String, dynamic>> chatsMap = await chatsRepo.getChatsForUser(user);
+    List<Chat> res = chatsMap.map((e) {
+      return Chat.fromJson(e);
+    }).toList();
+    return res;
+  }
+
   Future<Chat?> getChat(User friend) async {
     final json = await chatsRepo.getChat(friend);
     if (json.isEmpty)
@@ -36,8 +44,12 @@ class ChatsController {
     await chatsRepo.deleteChat(id);
   }
 
-  void updateLastMessage(Chat chat, Message message, {required bool forFriend}) async {
-    await chatsRepo.updateLastMessage(chat, message,forFriend: forFriend);
+  void updateLastMessage(
+    Chat chat,
+    Message message, {
+    required bool forFriend,
+  }) async {
+    await chatsRepo.updateLastMessage(chat, message, forFriend: forFriend);
   }
 
   void setIsDeleted(bool isDeleted, Chat chat) async {

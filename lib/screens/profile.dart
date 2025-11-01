@@ -1,5 +1,4 @@
 import 'package:chat_app/controllers/AuthController.dart';
-import 'package:chat_app/controllers/presenceHandler.dart';
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/screens/editBottomSheet.dart';
 import 'package:chat_app/screens/loginScreen.dart';
@@ -17,7 +16,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   AuthController authController = AuthController();
-  final PresenceHandler _presenceHandler = PresenceHandler();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,20 +53,30 @@ class _ProfileState extends State<Profile> {
                                 padding: const EdgeInsets.all(15.0),
                                 child: Hero(
                                   tag: "pfp",
-                                  child: CircleAvatar(
-                                    radius: 70,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(15),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.blue,
+                                        width: 2,
+                                      ),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 70,
 
-                                    backgroundColor: Colors.transparent,
-                                    backgroundImage:
-                                        widget.user.profilePictureUrl == '' ||
-                                            widget.user.profilePictureUrl ==
-                                                null
-                                        ? const AssetImage(
-                                            'assets/images/chatApp ui ux/icons8-user-50.png',
-                                          )
-                                        : NetworkImage(
-                                            widget.user.profilePictureUrl!,
-                                          ),
+                                      backgroundColor: Colors.transparent,
+                                      backgroundImage:
+                                          widget.user.profilePictureUrl == '' ||
+                                              widget.user.profilePictureUrl ==
+                                                  null
+                                          ? const AssetImage(
+                                              'assets/images/chatApp ui ux/icons8-user-50.png',
+                                            )
+                                          : NetworkImage(
+                                              widget.user.profilePictureUrl!,
+                                            ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -184,7 +193,6 @@ class _ProfileState extends State<Profile> {
               if (widget.isMine)
                 ElevatedButton(
                   onPressed: () async {
-                    _presenceHandler.dispose();
                     await authController.logOut();
                     Navigator.pushAndRemoveUntil(
                       context,

@@ -2,6 +2,7 @@ import 'package:chat_app/models/chat.dart';
 import 'package:chat_app/models/messages.dart';
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/repo/messagesRepo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MessagesController {
   MessagesRepo messagesRepo = MessagesRepo();
@@ -10,8 +11,46 @@ class MessagesController {
     await messagesRepo.addMessage(chat, message, me);
   }
 
-  void setSeen(Chat chat, User me, Message message,bool isLast) async {
-    await messagesRepo.setSeen(chat, me, message,isLast);
+  void setSeen(Chat chat, User me, Message message, bool isLast) async {
+    await messagesRepo.setSeen(chat, me, message, isLast);
+  }
+
+  void forwardMessages(
+    User me,
+    List<Message> messages,
+    List<Chat> chats,
+  ) async {
+    for (var chat in chats) {
+      final batch = FirebaseFirestore.instance.batch();
+
+      for (var message in messages) {
+        message.from = me;
+        message.to = chat.friend;
+        message.timeSent = DateTime.now();
+        message.isSeen = false;
+
+        final msgRef = FirebaseFirestore.instance
+            .collection("users")
+            .doc(me.id)
+            .collection('chats')
+            .doc(chat.id)
+            .collection('messages')
+            .doc();
+        final msgRefFriend = FirebaseFirestore.instance
+            .collection("users")
+            .doc(chat.friend.id)
+            .collection('chats')
+            .doc(chat.id)
+            .collection('messages')
+            .doc(msgRef.id);
+        message.id = msgRef.id;
+
+        batch.set(msgRef, message.toJson());
+        batch.set(msgRefFriend, message.toJson());
+      }
+
+      await batch.commit();
+    }
   }
 
   Stream<List<Message>> getMessages(Chat chat) {

@@ -193,18 +193,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     },
                     icon: const Icon(Icons.copy),
                   ),
-
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            Forwardsceen(user: widget.me, messages: selected),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.arrow_forward_ios_rounded),
-                ),
+                if (!selected.any((element) => element.isDeleted == true))
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              Forwardsceen(user: widget.me, messages: selected),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.arrow_forward_ios_rounded),
+                  ),
               ]
             : [],
         title: ListTile(

@@ -152,35 +152,41 @@ class _ProfileState extends State<Profile> {
                           ),
                           subtitle: Text(widget.user.bio ?? '...'),
                           trailing: widget.isMine
-                              ? IconButton(
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      isScrollControlled: true,
-                                      builder: (context) => Padding(
-                                        padding: EdgeInsets.only(
-                                          bottom: MediaQuery.of(
-                                            context,
-                                          ).viewInsets.bottom,
-                                        ),
-                                        child: SizedBox(
-                                          height:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.height *
-                                              0.55,
-                                          child: Editbottomsheet(
-                                            user: widget.user,
-                                            state: () {
-                                              setState(() {});
-                                            },
+                              ? CircleAvatar(
+                                  backgroundColor: Colors.transparent.withAlpha(
+                                    50,
+                                  ),
+                                  radius: 20,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        builder: (context) => Padding(
+                                          padding: EdgeInsets.only(
+                                            bottom: MediaQuery.of(
+                                              context,
+                                            ).viewInsets.bottom,
+                                          ),
+                                          child: SizedBox(
+                                            height:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.height *
+                                                0.55,
+                                            child: Editbottomsheet(
+                                              user: widget.user,
+                                              state: () {
+                                                setState(() {});
+                                              },
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.edit),
-                                  color: Colors.blueAccent,
+                                      );
+                                    },
+                                    icon: const Icon(Icons.edit),
+                                    color: Colors.blueAccent,
+                                  ),
                                 )
                               : null,
                         ),

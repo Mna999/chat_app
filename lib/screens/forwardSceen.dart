@@ -4,7 +4,7 @@ import 'package:chat_app/controllers/userController.dart';
 import 'package:chat_app/models/chat.dart';
 import 'package:chat_app/models/messages.dart';
 import 'package:chat_app/models/user.dart';
-import 'package:chat_app/screens/homeScreen.dart';
+import 'package:chat_app/screens/homeScreenNav.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -50,7 +50,7 @@ class _ForwardsceenState extends State<Forwardsceen> {
 
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
-                    builder: (context) => HomeScreen(user: widget.user),
+                    builder: (context) => const HomescreenNav(),
                   ),
                   (route) => false,
                 );

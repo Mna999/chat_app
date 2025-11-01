@@ -1,6 +1,7 @@
 import 'package:chat_app/models/chat.dart';
 import 'package:chat_app/models/messages.dart';
 import 'package:chat_app/models/user.dart';
+import 'package:chat_app/repo/chatsRepo.dart';
 import 'package:chat_app/repo/messagesRepo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -20,6 +21,7 @@ class MessagesController {
     List<Message> messages,
     List<Chat> chats,
   ) async {
+    ChatsRepo chatsRepo = ChatsRepo();
     for (var chat in chats) {
       final batch = FirebaseFirestore.instance.batch();
 
@@ -50,6 +52,11 @@ class MessagesController {
       }
 
       await batch.commit();
+      await chatsRepo.updateLastMessage(
+        chat,
+        messages[messages.length - 1],
+        forFriend: true,
+      );
     }
   }
 

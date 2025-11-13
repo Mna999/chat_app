@@ -2,6 +2,7 @@ import 'package:chat_app/controllers/AuthController.dart';
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/screens/editBottomSheet.dart';
 import 'package:chat_app/screens/loginScreen.dart';
+import 'package:chat_app/screens/pickImage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -54,11 +55,10 @@ class _ProfileState extends State<Profile> {
                                 child: Hero(
                                   tag: "pfp",
                                   child: Container(
-                                    padding: const EdgeInsets.all(15),
                                     decoration: BoxDecoration(
                                       border: Border.all(
                                         color: Colors.blue,
-                                        width: 2,
+                                        width: 4,
                                       ),
                                       shape: BoxShape.circle,
                                     ),
@@ -66,7 +66,7 @@ class _ProfileState extends State<Profile> {
                                       radius: 70,
 
                                       backgroundColor: Colors.transparent,
-                                      backgroundImage:
+                                      foregroundImage:
                                           widget.user.profilePictureUrl == '' ||
                                               widget.user.profilePictureUrl ==
                                                   null
@@ -90,7 +90,18 @@ class _ProfileState extends State<Profile> {
                                     backgroundColor: Colors.transparent
                                         .withAlpha(50),
                                     child: IconButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          context: context,
+                                          builder: (context) => Pickimage(
+                                            user: widget.user,
+                                            state: () {
+                                              setState(() {});
+                                            },
+                                          ),
+                                        );
+                                      },
                                       icon: const Icon(Icons.camera_alt),
                                       color: Colors.blueAccent,
                                     ),

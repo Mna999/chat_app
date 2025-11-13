@@ -3,6 +3,8 @@ import 'package:chat_app/firebase_options.dart';
 import 'package:chat_app/providers/ThemeModeProvider.dart';
 import 'package:chat_app/screens/homeScreenNav.dart';
 import 'package:chat_app/screens/loginScreen.dart';
+import 'package:cloudinary_flutter/cloudinary_context.dart';
+import 'package:cloudinary_url_gen/cloudinary.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +12,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
   runApp(ProviderScope(child: MyApp()));
 }
 

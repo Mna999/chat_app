@@ -365,9 +365,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         if (value.isEmpty && _cachedMessages.isNotEmpty) {
                           chatsController.setTyping(widget.chat, false);
                         }
-                        if (value.isNotEmpty &&
-                            prevText.isEmpty &&
-                            _cachedMessages.isNotEmpty) {
+                        if (value.isNotEmpty && _cachedMessages.isNotEmpty) {
                           chatsController.setTyping(widget.chat, true);
                         }
                         prevText = value;
@@ -438,6 +436,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                   );
 
                                   chatsController.setTyping(widget.chat, false);
+                                  messageController.clear();
                                   if (widget.chat.isDeleted) {
                                     chatsController.setIsDeleted(
                                       false,
@@ -463,7 +462,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                     );
                                   }
                                   chatsController.setTyping(widget.chat, false);
-
+                                  messageController.clear();
                                   selected.clear();
                                   isEditing = false;
                                   setState(() {});

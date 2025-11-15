@@ -12,16 +12,15 @@ class Imagecontroller {
   final cloudinary = CloudinaryPublic('dcga1llsc', 'dsdsds');
   File? pickedImage;
 
-  Future<void> pickImage(ImageSource source, User user) async {
+  Future<String?> pickImage(ImageSource source, User user) async {
     final XFile? image = await picker.pickImage(source: source);
-    if (image == null) return;
+    if (image == null) return null;
     pickedImage = File(image.path);
     String? url = await _uploadPfp(user.id);
 
-    if (url == null) return;
+    if (url == null) return null;
     log(url);
-    user.profilePictureUrl = url;
-    userController.updateUserForFriends(user);
+    return url;
   }
 
   Future<String?> _uploadPfp(String id) async {

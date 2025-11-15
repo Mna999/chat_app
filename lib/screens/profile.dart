@@ -1,25 +1,30 @@
 import 'package:chat_app/controllers/AuthController.dart';
+import 'package:chat_app/controllers/userController.dart';
 import 'package:chat_app/models/user.dart';
+import 'package:chat_app/providers/loadingProviderAuth.dart';
 import 'package:chat_app/screens/editBottomSheet.dart';
 import 'package:chat_app/screens/loginScreen.dart';
 import 'package:chat_app/screens/pickImage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Profile extends StatefulWidget {
+class Profile extends ConsumerStatefulWidget {
   Profile({super.key, required this.isMine, required this.user});
   bool isMine;
   User user;
 
   @override
-  State<Profile> createState() => _ProfileState();
+  ConsumerState<Profile> createState() => _ProfileState();
 }
 
-class _ProfileState extends State<Profile> {
+class _ProfileState extends ConsumerState<Profile> {
   AuthController authController = AuthController();
 
   @override
   Widget build(BuildContext context) {
+    bool isLoading = ref.watch(loadingAuthProvider);
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(28, 156, 158, 255),
       appBar: AppBar(
@@ -90,17 +95,23 @@ class _ProfileState extends State<Profile> {
                                     backgroundColor: Colors.transparent
                                         .withAlpha(50),
                                     child: IconButton(
-                                      onPressed: () {
-                                        showModalBottomSheet(
+                                      onPressed: () async {
+                                        final url = await showModalBottomSheet(
                                           isScrollControlled: true,
+                                          isDismissible: !isLoading,
                                           context: context,
-                                          builder: (context) => Pickimage(
-                                            user: widget.user,
-                                            state: () {
-                                              setState(() {});
-                                            },
-                                          ),
+                                          builder: (context) =>
+                                              Pickimage(user: widget.user),
                                         );
+                                        UserController userController =
+                                            UserController();
+                                        if (url != null) {
+                                          widget.user.profilePictureUrl = url;
+                                          setState(() {});
+                                          userController.updateUserForFriends(
+                                            widget.user,
+                                          );
+                                        }
                                       },
                                       icon: const Icon(Icons.camera_alt),
                                       color: Colors.blueAccent,

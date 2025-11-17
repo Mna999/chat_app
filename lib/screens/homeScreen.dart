@@ -147,13 +147,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   subtitle: Text(friend.email),
                   leading: CircleAvatar(
                     backgroundColor: Colors.transparent,
-                    backgroundImage:
+                    foregroundImage:
                         friend.profilePictureUrl == '' ||
                             friend.profilePictureUrl == null
                         ? const AssetImage(
                             'assets/images/chatApp ui ux/icons8-user-50.png',
                           )
                         : NetworkImage(friend.profilePictureUrl!),
+                    backgroundImage: const AssetImage(
+                      'assets/images/chatApp ui ux/icons8-user-50.png',
+                    ),
                   ),
                   onTap: () async {
                     Chat? res = await chatsController.getChat(friend);
@@ -342,7 +345,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             tag: 'pfp',
                             child: CircleAvatar(
                               backgroundColor: Colors.transparent,
-                              backgroundImage:
+                              backgroundImage: const AssetImage(
+                                'assets/images/chatApp ui ux/icons8-user-50.png',
+                              ),
+                              foregroundImage:
                                   snapshot
                                               .data![index]
                                               .friend

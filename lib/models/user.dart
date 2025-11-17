@@ -42,7 +42,6 @@ class User {
 
   String getLastActive() {
     DateTime now = DateTime.now();
-
     Duration diffDays = now.difference(lastActive);
 
     if (diffDays.inMinutes < 1) {

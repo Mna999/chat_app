@@ -4,6 +4,7 @@ import 'package:chat_app/models/user.dart';
 import 'package:chat_app/providers/loadingProviderAuth.dart';
 import 'package:chat_app/screens/editBottomSheet.dart';
 import 'package:chat_app/screens/loginScreen.dart';
+import 'package:chat_app/screens/pfp.dart';
 import 'package:chat_app/screens/pickImage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,30 +58,50 @@ class _ProfileState extends ConsumerState<Profile> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(15.0),
-                                child: Hero(
-                                  tag: "pfp",
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.blue,
-                                        width: 4,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            Pfp(user: widget.user),
                                       ),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: CircleAvatar(
-                                      radius: 70,
+                                    );
+                                  },
+                                  child: Hero(
+                                    tag: "pfp",
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border:
+                                            widget.user.profilePictureUrl !=
+                                                    '' &&
+                                                widget.user.profilePictureUrl !=
+                                                    null
+                                            ? Border.all(
+                                                color: Colors.blue,
+                                                width: 4,
+                                              )
+                                            : null,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 70,
 
-                                      backgroundColor: Colors.transparent,
-                                      foregroundImage:
-                                          widget.user.profilePictureUrl == '' ||
-                                              widget.user.profilePictureUrl ==
-                                                  null
-                                          ? const AssetImage(
-                                              'assets/images/chatApp ui ux/icons8-user-50.png',
-                                            )
-                                          : NetworkImage(
-                                              widget.user.profilePictureUrl!,
-                                            ),
+                                        backgroundImage: const AssetImage(
+                                          'assets/images/chatApp ui ux/icons8-user-50.png',
+                                        ),
+                                        backgroundColor: Colors.transparent,
+                                        foregroundImage:
+                                            widget.user.profilePictureUrl ==
+                                                    '' ||
+                                                widget.user.profilePictureUrl ==
+                                                    null
+                                            ? const AssetImage(
+                                                'assets/images/chatApp ui ux/icons8-user-50.png',
+                                              )
+                                            : NetworkImage(
+                                                widget.user.profilePictureUrl!,
+                                              ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -106,11 +127,14 @@ class _ProfileState extends ConsumerState<Profile> {
                                         UserController userController =
                                             UserController();
                                         if (url != null) {
+                                          String? prev =
+                                              widget.user.profilePictureUrl;
                                           widget.user.profilePictureUrl = url;
                                           setState(() {});
-                                          userController.updateUserForFriends(
-                                            widget.user,
-                                          );
+                                          if (prev != '')
+                                            userController.updateUserForFriends(
+                                              widget.user,
+                                            );
                                         }
                                       },
                                       icon: const Icon(Icons.camera_alt),

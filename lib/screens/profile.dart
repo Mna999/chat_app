@@ -248,7 +248,9 @@ class _ProfileState extends ConsumerState<Profile> {
                     await authController.logOut();
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => Loginscreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const Loginscreen(),
+                      ),
                       (route) => true,
                     );
                   },

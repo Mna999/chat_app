@@ -28,7 +28,8 @@ class _EditbottomsheetState extends State<Editbottomsheet> {
       key: formKey,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
-        child: Column(
+
+        child: ListView(
           children: [
             const Text(
               "Edit Details",
@@ -53,7 +54,7 @@ class _EditbottomsheetState extends State<Editbottomsheet> {
               decoration: const InputDecoration(labelText: "Bio"),
               controller: bio,
             ),
-            const Spacer(),
+            const SizedBox(height: 50),
             SizedBox(
               width: 200,
               child: ElevatedButton(

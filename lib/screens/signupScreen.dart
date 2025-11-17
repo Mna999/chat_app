@@ -22,6 +22,8 @@ class _SignUpscreenState extends ConsumerState<SignUpscreen> {
   String username = '';
   String email = '';
   String password = '';
+  bool isVisable = false;
+  bool isVisableConfirm = false;
 
   @override
   Widget build(BuildContext context) {
@@ -110,9 +112,26 @@ class _SignUpscreenState extends ConsumerState<SignUpscreen> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
-                    obscureText: true,
+                    obscureText: !isVisable,
                     keyboardType: TextInputType.visiblePassword,
-                    decoration: const InputDecoration(hintText: 'Password'),
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          isVisable = !isVisable;
+                          setState(() {});
+                        },
+                        icon: !isVisable
+                            ? const Icon(
+                                Icons.visibility,
+                                color: Color(0xFF6366F1),
+                              )
+                            : const Icon(
+                                Icons.visibility_off,
+                                color: Color(0xFF6366F1),
+                              ),
+                      ),
+                    ),
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (value) {
                       String val = value ?? '';
@@ -134,10 +153,25 @@ class _SignUpscreenState extends ConsumerState<SignUpscreen> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
-                    obscureText: true,
+                    obscureText: !isVisableConfirm,
                     keyboardType: TextInputType.visiblePassword,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'confirm password',
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          isVisableConfirm = !isVisableConfirm;
+                          setState(() {});
+                        },
+                        icon: !isVisableConfirm
+                            ? const Icon(
+                                Icons.visibility,
+                                color: Color(0xFF6366F1),
+                              )
+                            : const Icon(
+                                Icons.visibility_off,
+                                color: Color(0xFF6366F1),
+                              ),
+                      ),
                     ),
                     autovalidateMode: AutovalidateMode.onUserInteraction,
 
@@ -173,7 +207,10 @@ class _SignUpscreenState extends ConsumerState<SignUpscreen> {
                                 try {
                                   formKey.currentState!.save();
                                   isLoadingRef.set();
-                                  await authController.signUp(email.trim(), password.trim());
+                                  await authController.signUp(
+                                    email.trim(),
+                                    password.trim(),
+                                  );
                                   isLoadingRef.reset();
                                   User user = User(
                                     email: email.trim(),
@@ -184,14 +221,12 @@ class _SignUpscreenState extends ConsumerState<SignUpscreen> {
                                     username: username.trim(),
                                     profilePictureUrl: '',
                                     lastActive: DateTime.now(),
-                              
-                                    
                                   );
                                   await UserController().saveUser(user);
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => Loginscreen(),
+                                      builder: (context) => const Loginscreen(),
                                     ),
                                   );
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -238,7 +273,7 @@ class _SignUpscreenState extends ConsumerState<SignUpscreen> {
                             : () {
                                 Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                    builder: (context) => Loginscreen(),
+                                    builder: (context) => const Loginscreen(),
                                   ),
                                 );
                               },

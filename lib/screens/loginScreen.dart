@@ -9,18 +9,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Loginscreen extends ConsumerWidget {
-  Loginscreen({super.key});
+class Loginscreen extends ConsumerStatefulWidget {
+  const Loginscreen({super.key});
+
+  @override
+  ConsumerState<Loginscreen> createState() => _LoginscreenState();
+}
+
+class _LoginscreenState extends ConsumerState<Loginscreen> {
   GlobalKey<FormState> formKey = GlobalKey();
   AuthController authController = AuthController();
   String email = '';
   String password = '';
+  bool isVisiable = false;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     bool isDark = ref.watch(themeModeProvider.notifier).isDark();
     bool isLoading = ref.watch(loadingAuthProvider);
     final isLoadingRef = ref.read(loadingAuthProvider.notifier);
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -45,7 +53,6 @@ class Loginscreen extends ConsumerWidget {
                     children: [
                       SizedBox(
                         height: 35,
-
                         child: Image.asset(
                           fit: BoxFit.contain,
                           isDark
@@ -79,7 +86,6 @@ class Loginscreen extends ConsumerWidget {
                       'Login to your Halo account to continue chatting!',
                       style: GoogleFonts.montserrat(
                         fontSize: 15,
-
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.center,
@@ -103,9 +109,26 @@ class Loginscreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
-                    obscureText: true,
+                    obscureText: !isVisiable,
                     keyboardType: TextInputType.visiblePassword,
-                    decoration: const InputDecoration(hintText: 'Password'),
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          isVisiable = !isVisiable;
+                          setState(() {});
+                        },
+                        icon: !isVisiable
+                            ? const Icon(
+                                Icons.visibility,
+                                color: Color(0xFF6366F1),
+                              )
+                            : const Icon(
+                                Icons.visibility_off,
+                                color: Color(0xFF6366F1),
+                              ),
+                      ),
+                    ),
                     validator: (value) {
                       String val = value ?? '';
                       if (val.trim().isEmpty) {
@@ -130,7 +153,6 @@ class Loginscreen extends ConsumerWidget {
                                     backgroundColor: Theme.of(
                                       context,
                                     ).colorScheme.primary,
-
                                     content: const Text(
                                       'Please fill the form correctly',
                                       style: TextStyle(color: Colors.white),
@@ -152,7 +174,6 @@ class Loginscreen extends ConsumerWidget {
                                         backgroundColor: Theme.of(
                                           context,
                                         ).colorScheme.primary,
-
                                         content: const Text(
                                           'Please verify your email',
                                           style: TextStyle(color: Colors.white),
@@ -164,7 +185,8 @@ class Loginscreen extends ConsumerWidget {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => HomescreenNav(),
+                                        builder: (context) =>
+                                            const HomescreenNav(),
                                       ),
                                     );
                                   }
@@ -210,14 +232,13 @@ class Loginscreen extends ConsumerWidget {
                                     backgroundColor: Theme.of(
                                       context,
                                     ).colorScheme.primary,
-
                                     content: const Text(
                                       'An email was sent to reset your password',
                                       style: TextStyle(color: Colors.white),
                                     ),
                                   ),
                                 );
-                              } else
+                              } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     backgroundColor: Theme.of(
@@ -229,6 +250,7 @@ class Loginscreen extends ConsumerWidget {
                                     ),
                                   ),
                                 );
+                              }
                             },
                       child: const Text('Forgot Password'),
                     ),
@@ -268,7 +290,7 @@ class Loginscreen extends ConsumerWidget {
                             if (log)
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                  builder: (context) => HomescreenNav(),
+                                  builder: (context) => const HomescreenNav(),
                                 ),
                               );
                           },

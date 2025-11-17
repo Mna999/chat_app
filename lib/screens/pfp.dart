@@ -34,6 +34,8 @@ class _PfpState extends State<Pfp> {
                   child: ClipRRect(
                     child: PhotoView(
                       initialScale: PhotoViewComputedScale.covered,
+                      maxScale: PhotoViewComputedScale.covered * 4,
+                      minScale: PhotoViewComputedScale.covered * 1,
                       tightMode: false,
                       onTapUp: (context, details, controllerValue) {
                         if (isZoomed) {

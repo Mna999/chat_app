@@ -46,6 +46,8 @@ class _ForwardsceenState extends State<Forwardsceen> {
                   widget.user,
                   widget.messages,
                   selected,
+                  
+                    
                 );
 
                 Navigator.of(context).pushAndRemoveUntil(

@@ -81,8 +81,13 @@ class Message {
   }
 
   String getDate2() {
-    DateTime now = DateTime.now();
-    int diffDays = now.difference(timeSent).inDays;
+    DateTime now = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
+    DateTime diff = DateTime(timeSent.year, timeSent.month, timeSent.day);
+    int diffDays = now.difference(diff).inDays;
 
     if (diffDays == 0) {
       // 🔹 Today → show "Today at <time>"

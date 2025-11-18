@@ -75,8 +75,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       });
     }
     return Scaffold(
-      backgroundColor: !ref.watch(themeModeProvider.notifier).isDark()
-          ? const Color.fromARGB(244, 244, 255, 255)
+      backgroundColor: !ref.read(themeModeProvider.notifier).isDark()
+          ? const Color.fromARGB(244, 250, 246, 255)
           : const Color.fromARGB(28, 156, 158, 255),
       appBar: AppBar(
         centerTitle: false,

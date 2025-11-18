@@ -30,11 +30,6 @@ class _LoginscreenState extends ConsumerState<Loginscreen> {
     final isLoadingRef = ref.read(loadingAuthProvider.notifier);
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ref.read(themeModeProvider.notifier).toggleTheme();
-        },
-      ),
       body: Form(
         key: formKey,
         child: Padding(

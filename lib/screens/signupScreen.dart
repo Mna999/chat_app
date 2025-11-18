@@ -32,11 +32,6 @@ class _SignUpscreenState extends ConsumerState<SignUpscreen> {
     bool isDark = ref.watch(themeModeProvider.notifier).isDark();
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ref.read(themeModeProvider.notifier).toggleTheme();
-        },
-      ),
       body: Form(
         key: formKey,
         child: Padding(

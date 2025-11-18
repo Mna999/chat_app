@@ -1,6 +1,7 @@
 import 'package:chat_app/controllers/AuthController.dart';
 import 'package:chat_app/controllers/userController.dart';
 import 'package:chat_app/models/user.dart';
+import 'package:chat_app/providers/ThemeModeProvider.dart';
 import 'package:chat_app/providers/loadingProviderAuth.dart';
 import 'package:chat_app/screens/editBottomSheet.dart';
 import 'package:chat_app/screens/loginScreen.dart';
@@ -25,7 +26,7 @@ class _ProfileState extends ConsumerState<Profile> {
   @override
   Widget build(BuildContext context) {
     bool isLoading = ref.watch(loadingAuthProvider);
-
+    bool isDark = ref.watch(themeModeProvider.notifier).isDark();
     return Scaffold(
       backgroundColor: const Color.fromARGB(28, 156, 158, 255),
       appBar: AppBar(
@@ -113,8 +114,12 @@ class _ProfileState extends ConsumerState<Profile> {
 
                                   child: CircleAvatar(
                                     radius: 20,
-                                    backgroundColor: Colors.transparent
-                                        .withAlpha(50),
+                                    backgroundColor:
+                                        ref
+                                            .read(themeModeProvider.notifier)
+                                            .isDark()
+                                        ? Colors.transparent.withAlpha(50)
+                                        : Colors.transparent.withAlpha(20),
                                     child: IconButton(
                                       onPressed: () async {
                                         final url = await showModalBottomSheet(
@@ -179,15 +184,16 @@ class _ProfileState extends ConsumerState<Profile> {
                     ),
                     child: Column(
                       children: [
-                        const Text(
-                          "Details",
+                        Text(
+                          widget.isMine ? "Details And Appearance" : "Details",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 12),
                         ListTile(
                           title: Text(
                             widget.user.username,
@@ -199,9 +205,12 @@ class _ProfileState extends ConsumerState<Profile> {
                           subtitle: Text(widget.user.bio ?? '...'),
                           trailing: widget.isMine
                               ? CircleAvatar(
-                                  backgroundColor: Colors.transparent.withAlpha(
-                                    50,
-                                  ),
+                                  backgroundColor:
+                                      ref
+                                          .read(themeModeProvider.notifier)
+                                          .isDark()
+                                      ? Colors.transparent.withAlpha(50)
+                                      : Colors.transparent.withAlpha(20),
                                   radius: 20,
                                   child: IconButton(
                                     onPressed: () {
@@ -235,6 +244,19 @@ class _ProfileState extends ConsumerState<Profile> {
                                   ),
                                 )
                               : null,
+                        ),
+                        const SizedBox(height: 20),
+                        SwitchListTile(
+                          title: const Text(
+                            'Dark mode',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          subtitle: const Text("turn on dark mode"),
+                          value: isDark,
+                          onChanged: (value) {
+                            ref.read(themeModeProvider.notifier).toggleTheme();
+                            setState(() {});
+                          },
                         ),
                       ],
                     ),

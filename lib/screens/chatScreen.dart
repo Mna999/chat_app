@@ -8,6 +8,7 @@ import 'package:chat_app/controllers/userController.dart';
 import 'package:chat_app/models/chat.dart';
 import 'package:chat_app/models/messages.dart';
 import 'package:chat_app/models/user.dart';
+import 'package:chat_app/providers/ThemeModeProvider.dart';
 import 'package:chat_app/providers/textProvider.dart';
 import 'package:chat_app/screens/chatBubble.dart';
 import 'package:chat_app/screens/forwardSceen.dart';
@@ -74,7 +75,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       });
     }
     return Scaffold(
-      backgroundColor: const Color.fromARGB(28, 156, 158, 255),
+      backgroundColor: !ref.watch(themeModeProvider.notifier).isDark()
+          ? const Color.fromARGB(244, 244, 255, 255)
+          : const Color.fromARGB(28, 156, 158, 255),
       appBar: AppBar(
         centerTitle: false,
         actions: selected.isNotEmpty
@@ -338,7 +341,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
 
           Container(
-            color: Colors.black,
+            color: ref.read(themeModeProvider.notifier).isDark()
+                ? Colors.black
+                : const Color.fromARGB(244, 244, 255, 255),
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
             alignment: Alignment.bottomCenter,
             child: Row(
@@ -602,9 +607,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                     time: Text(
                       message.getTime(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white70,
+                        color:
+                            message.from.id == widget.me.id ||
+                                ref.read(themeModeProvider.notifier).isDark()
+                            ? Colors.white70
+                            : Colors.black,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -612,7 +621,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     isSender: message.from.id == widget.me.id,
                     color: message.from.id == widget.me.id
                         ? const Color(0xFF1B97F3)
-                        : const Color.fromARGB(28, 156, 158, 255),
+                        : ref.read(themeModeProvider.notifier).isDark()
+                        ? const Color.fromARGB(28, 156, 158, 255)
+                        : Colors.white,
                     tail: true,
                     child: Linkify(
                       text: message.isDeleted
@@ -622,11 +633,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         fontSize: 16,
                         color: message.isDeleted
                             ? const Color.fromARGB(255, 204, 204, 204)
-                            : Colors.white,
+                            : message.from.id == widget.me.id ||
+                                  ref.read(themeModeProvider.notifier).isDark()
+                            ? Colors.white70
+                            : Colors.black,
                       ),
-                      linkStyle: const TextStyle(
+                      linkStyle: TextStyle(
                         overflow: TextOverflow.ellipsis,
-                        color: Colors.white,
+                        color:
+                            message.from.id == widget.me.id ||
+                                ref.read(themeModeProvider.notifier).isDark()
+                            ? Colors.white70
+                            : Colors.black,
                         decoration: TextDecoration.underline,
                       ),
                       onOpen: (link) async {

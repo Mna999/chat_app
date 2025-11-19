@@ -1,5 +1,4 @@
 import 'package:chat_app/controllers/imageController.dart';
-import 'package:chat_app/controllers/userController.dart';
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/providers/loadingProviderAuth.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +30,27 @@ class _PickimageState extends ConsumerState<Pickimage> {
           builder: (context, constraints) => SizedBox(
             height: MediaQuery.of(context).size.height * 0.35,
             child: isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Please dont close this window until upload is complete',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          CircularProgressIndicator(),
+                        ],
+                      ),
+                    ),
+                  )
                 : Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Row(
@@ -109,11 +128,9 @@ class _PickimageState extends ConsumerState<Pickimage> {
                           width: constraints.maxWidth / 3,
                           child: InkWell(
                             onTap: () async {
-                    
-                                if (mounted) {
+                              if (mounted) {
                                 Navigator.pop(context, '');
                               }
-                              
                             },
                             child: const Column(
                               mainAxisAlignment: MainAxisAlignment.center,

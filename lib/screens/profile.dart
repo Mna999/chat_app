@@ -120,7 +120,7 @@ class _ProfileState extends ConsumerState<Profile> {
                                         ref
                                             .read(themeModeProvider.notifier)
                                             .isDark()
-                                        ? Colors.transparent.withAlpha(50)
+                                        ? Colors.transparent.withAlpha(20)
                                         : Colors.transparent.withAlpha(20),
                                     child: IconButton(
                                       onPressed: () async {
@@ -138,10 +138,10 @@ class _ProfileState extends ConsumerState<Profile> {
                                               widget.user.profilePictureUrl;
                                           widget.user.profilePictureUrl = url;
                                           setState(() {});
-                                          if (prev != '')
-                                            userController.updateUserForFriends(
-                                              widget.user,
-                                            );
+
+                                          userController.updateUserForFriends(
+                                            widget.user,
+                                          );
                                         }
                                       },
                                       icon: const Icon(Icons.camera_alt),

@@ -4,25 +4,29 @@ import 'package:chat_app/controllers/userController.dart';
 import 'package:chat_app/models/chat.dart';
 import 'package:chat_app/models/messages.dart';
 import 'package:chat_app/models/user.dart';
+import 'package:chat_app/providers/ThemeModeProvider.dart';
 import 'package:chat_app/screens/homeScreenNav.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Forwardsceen extends StatefulWidget {
+class Forwardsceen extends ConsumerStatefulWidget {
   Forwardsceen({super.key, required this.user, required this.messages});
   User user;
   List<Message> messages;
+
   @override
-  State<Forwardsceen> createState() => _ForwardsceenState();
+  ConsumerState<Forwardsceen> createState() => _ForwardsceenState();
 }
 
-class _ForwardsceenState extends State<Forwardsceen> {
+class _ForwardsceenState extends ConsumerState<Forwardsceen> {
   bool isLoading = true;
   UserController userController = UserController();
   ChatsController chatsController = ChatsController();
   MessagesController messagesController = MessagesController();
   List<Chat> chats = [];
   List<Chat> selected = [];
+
   @override
   void initState() {
     super.initState();
@@ -46,8 +50,6 @@ class _ForwardsceenState extends State<Forwardsceen> {
                   widget.user,
                   widget.messages,
                   selected,
-                  
-                    
                 );
 
                 Navigator.of(context).pushAndRemoveUntil(
@@ -59,7 +61,9 @@ class _ForwardsceenState extends State<Forwardsceen> {
               },
             )
           : null,
-      backgroundColor: const Color.fromARGB(28, 156, 158, 255),
+      backgroundColor: !ref.read(themeModeProvider.notifier).isDark()
+          ? const Color.fromARGB(244, 250, 246, 255)
+          : const Color.fromARGB(28, 156, 158, 255),
       appBar: AppBar(
         title: Text(
           'Halo',
@@ -85,11 +89,14 @@ class _ForwardsceenState extends State<Forwardsceen> {
                     decoration: BoxDecoration(
                       boxShadow: const [BoxShadow(offset: Offset(2, 2))],
                       color: selected.contains(chats[index])
-                          ? const Color.fromARGB(255, 1, 31, 84)
-                          : const Color.fromARGB(255, 28, 28, 28),
+                          ? ref.read(themeModeProvider.notifier).isDark()
+                                ? const Color.fromARGB(255, 1, 31, 84)
+                                : const Color.fromARGB(255, 141, 200, 249)
+                          : ref.read(themeModeProvider.notifier).isDark()
+                          ? const Color.fromARGB(255, 28, 28, 28)
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
-
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ListTile(
@@ -109,7 +116,6 @@ class _ForwardsceenState extends State<Forwardsceen> {
                                       chats[index].friend.profilePictureUrl!,
                                     ),
                             ),
-
                             Positioned(
                               bottom: 2,
                               right: 0,

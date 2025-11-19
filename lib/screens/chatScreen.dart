@@ -363,6 +363,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   builder: (context, ref, _) => SizedBox(
                     width: MediaQuery.of(context).size.width * 0.6,
                     child: TextField(
+                      enableSuggestions: true,
+                      autocorrect: true,
+                      style: TextStyle(
+                        color: ref.read(themeModeProvider.notifier).isDark()
+                            ? Colors.white
+                            : Colors.black,
+                      ),
                       controller: messageController,
                       focusNode: focusNode,
                       onChanged: (value) {
@@ -495,26 +502,32 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               },
 
               textEditingController: messageController,
-              config: const Config(
+              config: Config(
                 height: 256,
                 checkPlatformCompatibility: true,
                 emojiViewConfig: EmojiViewConfig(
-                  backgroundColor: Color(0xFF1E1E1E),
+                  backgroundColor: ref.read(themeModeProvider.notifier).isDark()
+                      ? const Color(0xFF1E1E1E)
+                      : Colors.white,
                   columns: 8,
                   emojiSizeMax: 28,
                 ),
                 categoryViewConfig: CategoryViewConfig(
-                  backgroundColor: Color(0xFF2C2C2C),
+                  backgroundColor: ref.read(themeModeProvider.notifier).isDark()
+                      ? const Color(0xFF2C2C2C)
+                      : const Color.fromARGB(244, 250, 246, 255),
                   iconColor: Colors.grey,
                   iconColorSelected: Colors.blue,
                   indicatorColor: Colors.blue,
                 ),
                 bottomActionBarConfig: BottomActionBarConfig(
-                  backgroundColor: Color(0xFF2C2C2C),
+                  backgroundColor: ref.read(themeModeProvider.notifier).isDark()
+                      ? const Color(0xFF2C2C2C)
+                      : const Color.fromARGB(244, 250, 246, 255),
                   buttonColor: Colors.transparent,
                   buttonIconColor: Colors.blue,
                 ),
-                searchViewConfig: SearchViewConfig(
+                searchViewConfig: const SearchViewConfig(
                   backgroundColor: Color(0xFF1E1E1E),
                 ),
               ),
@@ -635,7 +648,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             ? const Color.fromARGB(255, 204, 204, 204)
                             : message.from.id == widget.me.id ||
                                   ref.read(themeModeProvider.notifier).isDark()
-                            ? Colors.white70
+                            ? Colors.white
                             : Colors.black,
                       ),
                       linkStyle: TextStyle(
@@ -643,7 +656,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         color:
                             message.from.id == widget.me.id ||
                                 ref.read(themeModeProvider.notifier).isDark()
-                            ? Colors.white70
+                            ? Colors.white
                             : Colors.black,
                         decoration: TextDecoration.underline,
                       ),

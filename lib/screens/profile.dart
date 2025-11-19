@@ -28,7 +28,9 @@ class _ProfileState extends ConsumerState<Profile> {
     bool isLoading = ref.watch(loadingAuthProvider);
     bool isDark = ref.watch(themeModeProvider.notifier).isDark();
     return Scaffold(
-      backgroundColor: const Color.fromARGB(28, 156, 158, 255),
+      backgroundColor: isDark
+          ? const Color.fromARGB(28, 156, 158, 255)
+          : const Color.fromARGB(244, 250, 246, 255),
       appBar: AppBar(
         title: Text(
           'Halo',
@@ -245,19 +247,22 @@ class _ProfileState extends ConsumerState<Profile> {
                                 )
                               : null,
                         ),
-                        const SizedBox(height: 20),
-                        SwitchListTile(
-                          title: const Text(
-                            'Dark mode',
-                            style: TextStyle(fontSize: 20),
+                        if (widget.isMine) const SizedBox(height: 20),
+                        if (widget.isMine)
+                          SwitchListTile(
+                            title: const Text(
+                              'Dark mode',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            subtitle: const Text("turn on dark mode"),
+                            value: isDark,
+                            onChanged: (value) {
+                              ref
+                                  .read(themeModeProvider.notifier)
+                                  .toggleTheme();
+                              setState(() {});
+                            },
                           ),
-                          subtitle: const Text("turn on dark mode"),
-                          value: isDark,
-                          onChanged: (value) {
-                            ref.read(themeModeProvider.notifier).toggleTheme();
-                            setState(() {});
-                          },
-                        ),
                       ],
                     ),
                   ),
